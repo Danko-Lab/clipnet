@@ -46,7 +46,9 @@ CLIPNET was trained on a [population-scale PRO-cap dataset](http://dx.doi.org/10
 
 CLIPNET can either work on haploid reference sequences (e.g. hg38) or on individualized sequences (e.g. 1kGP). When constructing individualized sequences, we made two major simplifications: (1) We considered only SNPs and (2) we used unphased SNP genotypes.
 
-### Predictions
+### Command line interface
+
+#### Predictions
 
 To generate predictions, use the `predict.py` script. For example, to predict on the reference sequence:
 
