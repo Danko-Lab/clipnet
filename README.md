@@ -32,7 +32,10 @@ pip install -r shap_requirements.txt
 Pretrained CLIPNET models are available on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.10408622). Download the models and unzip them into the `ensemble_models` directory:
 
 ```bash
-for fold in {1..9}; do wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -O ensemble_models/fold_${fold}.h5; done
+for fold in {1..9};
+do 
+wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -O ensemble_models/fold_${fold}.h5;
+done
 ```
 
 ## Usage
