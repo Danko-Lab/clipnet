@@ -23,10 +23,8 @@ class OneHotDNA:
             self.seq = record.seq
         else:
             self.seq = record
-
         # get sequence into an array
         seq_list = list(self.seq.upper())
-
         # one hot the sequence
         encoding = {
             "A": np.array([2, 0, 0, 0]),
@@ -75,6 +73,11 @@ class RevOneHotDNA:
 
         seq = [reverse_encoding[np.array(pos).tobytes()] for pos in onehot.tolist()]
         self.seq = "".join(seq)
+
+
+def get_onehot(seq):
+    """Extracts just the onehot encoding from OneHotDNA."""
+    return OneHotDNA(seq).onehot
 
 
 def gz_read(fp):
@@ -129,13 +132,21 @@ def get_bedtool_from_list(bt, list_of_ints):
     return [bt[i] for i in list_of_ints]
 
 
-def get_onehot_fasta_sequences(fasta_fp):
+def get_onehot_fasta_sequences(fasta_fp, cores=16):
     """
     Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
     array of all sequences.
     """
-    fna = pyfastx.Fasta(fasta_fp)
-    onehot_encoded = np.array([OneHotDNA(rec.seq).onehot for rec in fna])
+    seqs = [rec.seq for rec in pyfastx.Fasta(fasta_fp)]
+    if cores > 1:
+        # Use multiprocessing to parallelize onehot encoding
+        import multiprocessing as mp
+
+        pool = mp.Pool(min(cores, mp.cpu_count()))
+        parallelized = pool.map(get_onehot, seqs)
+        onehot_encoded = np.array([p for p in parallelized])
+    else:
+        onehot_encoded = np.array([OneHotDNA(seq).onehot for seq in seqs])
     return onehot_encoded
 
 
@@ -192,20 +203,19 @@ def slice_procap(procap, pad):
         return procap[:, slc]
 
 
-def check_dimensions(seq, dnase, procap):
-    """Check that dimensions are correct"""
+def check_dimensions(seq, procap, dnase=None):
+    """Check that dimensions are correct. DNase will be ignored if it is None."""
     assert (
-        seq.shape[0] == dnase.shape[0] == procap.shape[0]
-    ), "n_samples: seq = %d, dnase = %d, procap = %d." % (
-        seq.shape[0],
-        dnase.shape[0],
-        procap.shape[0],
-    )
+        seq.shape[0] == procap.shape[0]
+    ), f"n_samples: seq={seq.shape[0]}, procap={procap.shape[0]}."
     assert (
-        seq.shape[1] == dnase.shape[1] == procap.shape[1] / 2
-    ), "len(windows): seq = %d, dnase = %d, procap = %d." % (
-        seq.shape[1],
-        dnase.shape[1],
-        procap.shape[1],
-    )
+        seq.shape[1] == procap.shape[1] / 2
+    ), f"len(windows): seq={seq.shape[1]}, procap={procap.shape[1]}."
+    if dnase is not None:
+        assert (
+            seq.shape[0] == dnase.shape[0]
+        ), f"n_samples: seq,procap={seq.shape[0]}, dnase={dnase.shape[0]}"
+        assert (
+            seq.shape[1] == dnase.shape[1] == procap.shape[1] / 2
+        ), f"len(windows): seq,procap={seq.shape[1]}, dnase={dnase.shape[1]}"
     assert seq.shape[2] == 4, "seq dummy variables = %d." % seq.shape[2]
