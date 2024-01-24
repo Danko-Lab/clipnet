@@ -34,7 +34,7 @@ Pretrained CLIPNET models are available on [Zenodo](https://zenodo.org/doi/10.52
 ```bash
 for fold in {1..9};
 do 
-wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -O ensemble_models/fold_${fold}.h5;
+wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -P ensemble_models/;
 done
 ```
 
