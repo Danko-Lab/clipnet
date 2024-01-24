@@ -15,33 +15,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("fasta_fp", type=str, help="fasta file.")
     parser.add_argument("output_fp", type=str, help="output file path.")
-    parser.add_argument(
-        "--model_fp",
-        type=str,
-        default="/home2/ayh8/ensemble_models/fold1.h5",
-        help="model file path.",
-    )
+    parser.add_argument("model_fp", type=str, help="model file path.")
     parser.add_argument(
         "--reverse_complement",
         action="store_true",
         help="reverse complements the input data.",
     )
-    parser.add_argument("--n_gpus", type=int, default=1, help="number of gpus to use.")
-    parser.add_argument(
-        "--use_specific_gpu",
-        type=int,
-        default=None,
-        help="Specify index of gpu to use. Requires n_gpus=1.",
-    )
+    parser.add_argument("--n_gpus", type=int, default=0, help="number of gpus to use.")
     parser.add_argument(
         "--low_mem", action="store_true", help="Use smaller batch size to fit in VRAM."
     )
     args = parser.parse_args()
 
-    nn = clipnet.CLIPNET(
-        n_gpus=args.n_gpus,
-        use_specific_gpu=args.use_specific_gpu,
-    )
+    nn = clipnet.CLIPNET(n_gpus=args.n_gpus)
     prediction = nn.predict_on_fasta(
         model_fp=args.model_fp,
         fasta_fp=args.fasta_fp,

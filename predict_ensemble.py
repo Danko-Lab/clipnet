@@ -13,35 +13,31 @@ import clipnet
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("fasta_fp", type=str, help="fasta file.")
-    parser.add_argument("output_fp", type=str, help="output file path.")
+    parser.add_argument(
+        "fasta_fp",
+        type=str,
+        help="Input (fasta) file. For individualized genome sequences, \
+            heterozygous positions should be represented using IUPAC ambiguity codes.",
+    )
+    parser.add_argument("output_fp", type=str, help="Output (hdf5) file path.")
     parser.add_argument(
         "--model_dir",
         type=str,
         default="ensemble_models/",
-        help="directory to load models from",
+        help="Directory to load models from",
     )
     parser.add_argument(
         "--reverse_complement",
         action="store_true",
-        help="reverse complements the input data.",
+        help="Reverse complements the input data.",
     )
-    parser.add_argument("--n_gpus", type=int, default=1, help="number of gpus to use.")
+    parser.add_argument("--n_gpus", type=int, default=0, help="Number of gpus to use.")
     parser.add_argument(
-        "--use_specific_gpu",
-        type=int,
-        default=None,
-        help="If n_gpus==1, allows choice of specific gpu.",
-    )
-    parser.add_argument(
-        "--low_mem", action="store_true", help="Use smaller batch size to fit in VRAM."
+        "--low_mem", action="store_true", help="Predict in batches to fit in VRAM."
     )
     args = parser.parse_args()
 
-    nn = clipnet.CLIPNET(
-        n_gpus=args.n_gpus,
-        use_specific_gpu=args.use_specific_gpu,
-    )
+    nn = clipnet.CLIPNET(n_gpus=args.n_gpus)
     ensemble_predictions = nn.predict_ensemble(
         model_dir=args.model_dir,
         fasta_fp=args.fasta_fp,

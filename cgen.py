@@ -1,6 +1,6 @@
 """
-This file contains a number of functions and the class CGen (CLIPNET Generator) that assist in loading data for the
-CLIPNET project.
+This file contains a number of functions and the class CGen (CLIPNET Generator) that
+assist in loading data while training CLIPNET models.
 """
 
 import os
@@ -9,6 +9,7 @@ import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+
 import utils
 
 

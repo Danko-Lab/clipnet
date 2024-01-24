@@ -1,6 +1,6 @@
 """
 This file contains the CLIPNET class, which contains most of the main functions used to 
-it, predict, and interpret the residual neural networks used in the CLIPNET project.
+it, predict, and interpret the convolutional neural networks used in the CLIPNET project.
 """
 
 import importlib
@@ -9,14 +9,15 @@ import math
 import os
 from pathlib import Path
 
-import cgen
 import GPUtil
 import numpy as np
 import tensorflow as tf
-import time_history
-import utils
 from tensorflow.keras.callbacks import CSVLogger
 from tqdm.keras import TqdmCallback
+
+import cgen
+import time_history
+import utils
 
 
 class CLIPNET:
