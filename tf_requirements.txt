@@ -16,7 +16,7 @@ pysam
 pytest
 pip
 pybedtools~=0.9
-scipy~=1.10
+scipy
 scikit-learn~=1.3
 tensorflow~=2.13.0
 seqlogo
