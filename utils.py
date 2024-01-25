@@ -150,6 +150,18 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
     return onehot_encoded
 
 
+def twohot_fasta(fasta_fp, cores=16):
+    """
+    Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
+    array of all sequences.
+
+    ### NOTE: THIS IS A RENAME OF get_onehot_fasta_sequences(). I originally called
+    ### our encoding onehot, but it's too late to start renaming everything now. :(
+    ### This function is used to make the API less of a mess.
+    """
+    return get_onehot_fasta_sequences(fasta_fp, cores=cores)
+
+
 def get_consensus_region(bed_intervals, consensus_fp):
     """
     Given a list of bed intervals and a consensus.fna file path, get list of sequences
