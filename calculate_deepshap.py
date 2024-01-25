@@ -23,11 +23,10 @@ tf.compat.v1.disable_v2_behavior()
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("model_fp", type=str, help="Model file path.")
-
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
     parser.add_argument("score_fp", type=str, help="Where to write DeepSHAP scores.")
     parser.add_argument(
-        "seq_fp", type=int, help="Which to write one-encoding of sequences."
+        "seq_fp", type=int, help="Where to write one-encoding of sequences."
     )
     parser.add_argument(
         "--mode",
@@ -40,7 +39,7 @@ def main():
         "--n_subset",
         type=int,
         default=100,
-        help="Number of sequences to use as background. \
+        help="Maximum number of sequences to use as background. \
             Default is 100 to ensure reasonably fast compute on large datasets.",
     )
     parser.add_argument(
@@ -60,10 +59,11 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    assert args.n_subset <= len(sequences), "n_subset must be <= number of sequences."
-    seqs_to_explain = utils.get_onehot_fasta_sequences(args.fasta_fp)
+    seqs_to_explain = np.array([utils.OneHotDNA(seq).onehot for seq in sequences])
 
     # Perform dinucleotide shuffle on n_subset random sequences
+    if len(sequences) < args.n_subset:
+        args.n_subset = len(sequences)
     reference = [
         sequences[i]
         for i in np.random.choice(

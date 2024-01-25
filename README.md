@@ -55,10 +55,7 @@ To generate predictions using the ensembled model, use the `predict_ensemble.py`
 
 ```bash
 # conda activate tf
-python predict_ensemble.py \
-    data/test.fa \
-    data/test.h5 \
-    #--gpu # enable to use a single NVIDIA GPU to calculate predictions.
+python predict_ensemble.py data/test.fa data/test.h5 --gpu
 ```
 
 To input individualized sequences, heterozygous positions should be represented using the IUPAC ambiguity codes R (A/G), Y (C/T), S (C/G), W (A/T), K (G/T), M (A/C).
@@ -91,6 +88,14 @@ python calculate_deepshap.py \
     data/test_deepshap.npz \
     data/test_onehot.npz \
     --mode quantity \
-    --n_subset 5
-    #--gpu # enable to use a single NVIDIA GPU to calculate interpretations
+    --gpu
+```
+
+#### Genomic *in silico* mutagenesis scans
+
+To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
+
+```bash
+# conda activate tf
+python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
 ```
