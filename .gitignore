@@ -1,5 +1,7 @@
 **/.DS_Store
 data/scratch.fa
+data/*.fai
+data/*.fxi
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Python gitignore

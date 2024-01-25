@@ -55,7 +55,7 @@ To generate predictions using the ensembled model, use the `predict_ensemble.py`
 
 ```bash
 # conda activate tf
-python predict_ensemble.py data/test.fa data/test.h5 #--gpu
+python predict_ensemble.py data/test.fa data/test_predictions.h5 #--gpu
 # Use the --gpu flag to run on GPU
 ```
 
@@ -86,10 +86,16 @@ This script supports two modes: "profile" and "quantity". The "profile" mode cal
 python calculate_deepshap.py \
     ensemble_models/fold_1.h5 \
     data/test.fa \
-    data/test_deepshap.npz \
+    data/test_deepshap_quantity.npz \
     data/test_onehot.npz \
     --mode quantity 
-    #--mode profile
+
+python calculate_deepshap.py \
+    ensemble_models/fold_1.h5 \
+    data/test.fa \
+    data/test_deepshap_profile.npz \
+    data/test_onehot.npz \
+    --mode profile
 ```
 
 Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last.
