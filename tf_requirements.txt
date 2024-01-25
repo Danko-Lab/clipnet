@@ -6,7 +6,6 @@ gputil
 joblib~=1.3
 numpy
 pandas
-pybedtools~=0.9.0
 pyfastx~=1.1.0
 pysam
 pip
