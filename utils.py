@@ -235,14 +235,14 @@ def check_dimensions(seq, procap, dnase=None):
 
 # The following functions are adapted from DeepLIFT and https://alextseng.net/blog/posts/20201122-kmer-shuffles/:
 
+
 def string_to_char_array(seq):
     """
     Converts an ASCII string to a NumPy array of byte-long ASCII codes.
     e.g. "ACGT" becomes [65, 67, 71, 84].
     """
     return np.frombuffer(bytes(seq, "utf8"), dtype=np.int8)
-        precis_buckets = np.zeros_like(precis)
-        np.put_along_axis(precis_buckets, thresh_buckets, precis, -1)
+
 
 def char_array_to_string(arr):
     """
@@ -313,7 +313,7 @@ def kshuffle(seq, num_shufs=1, k=2, random_seed=None):
     arr_shortmers = np.empty((len(arr), k - 1), dtype=arr.dtype)
     arr_shortmers[:] = -1
     for i in range(k - 1):
-        arr_shortmers[:len(arr) - i, i] = arr[i:]
+        arr_shortmers[: len(arr) - i, i] = arr[i:]
 
     # Get the set of all shortmers, and a mapping of which positions start with
     # which shortmers; `tokens` is the mapping, and is an integer representation
