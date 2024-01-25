@@ -72,7 +72,7 @@ import numpy as np
 with h5py.File("data/test.h5", "r") as f:
     profile = f["track"][:]
     quantity = f["quantity"][:]
-    profile_scaled = profile * quantity[:, None] / np.sum(profile, axis=1)[:, None]
+    profile_scaled = (profile / np.sum(profile, axis=1)[:, None]) * quantity
 ```
 
 #### Feature interpretations

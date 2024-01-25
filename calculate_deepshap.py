@@ -25,9 +25,7 @@ def main():
     parser.add_argument("model_fp", type=str, help="Model file path.")
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
     parser.add_argument("score_fp", type=str, help="Where to write DeepSHAP scores.")
-    parser.add_argument(
-        "seq_fp", type=int, help="Where to write one-encoding of sequences."
-    )
+    parser.add_argument("seq_fp", type=str, help="Where to write onehot sequences.")
     parser.add_argument(
         "--mode",
         type=str,
