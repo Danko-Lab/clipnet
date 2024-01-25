@@ -1,5 +1,4 @@
 cython
-gcc~=12.1
 GPUtil
 h5py
 joblib~=1.3
