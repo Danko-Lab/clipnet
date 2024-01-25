@@ -105,3 +105,24 @@ To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffl
 # conda activate tf
 python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
 ```
+
+#### API usage
+
+CLIPNET models can be directly loaded as follows. Individual models can simply be loaded using `tensorflow`:
+
+```python
+import tensorflow as tf
+
+nn = tf.keras.models.load_model("ensemble_models/fold_1.h5", compile=False)
+```
+
+The model ensemble is constructed by averaging the track and quantity outputs of each model fold. To make this easy, we've provided a simple API for doing this:
+
+```python
+import sys
+sys.path.append(PATH_TO_THIS_DIRECTORY)
+import clipnet
+
+nn = clipnet.CLIPNET(n_gpus=1)
+ensemble = nn.construct_ensemble()
+```
