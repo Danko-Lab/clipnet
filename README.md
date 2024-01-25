@@ -76,7 +76,7 @@ with h5py.File("data/test.h5", "r") as f:
 
 #### Feature interpretations
 
-CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. These files are required as input for [tfmodisco-lite](https://github.com/jmschrei/tfmodisco-lite/tree/main). Since calculating these interpretations can be quite slow when run on large datasets, this script is set up to calculate for a single model fold. This enables easy multi-GPU calculation of DeepSHAP scores, since you can just run one script on each GPU.
+CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. These files are required as input for [`tfmodisco-lite`](https://github.com/jmschrei/tfmodisco-lite/tree/main). Since calculating these interpretations can be quite slow when run on large datasets, this script is set up to calculate for a single model fold. This enables easy multi-GPU calculation of DeepSHAP scores, since you can just run one script on each GPU.
 
 This script supports two modes: "profile" and "quantity". The "profile" mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the "quantity" mode calculates interpretations for the quantity node of the model. For example:
 
@@ -90,6 +90,12 @@ python calculate_deepshap.py \
     --mode quantity \
     --gpu
 ```
+
+Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last.
+
+Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero.
+
+The outputs of this model can be used as input to `tfmodisco-lite` to generate motif logos and motif tracks.
 
 #### Genomic *in silico* mutagenesis scans
 
