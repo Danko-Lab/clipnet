@@ -6,7 +6,6 @@ import argparse
 
 import numpy as np
 import pyfastx
-import ushuffle
 from scipy.spatial.distance import cdist
 
 import clipnet
@@ -82,7 +81,7 @@ def main():
         for shuffle in range(args.n_shuffles):
             mutated_seqs = []
             for pos in positions:
-                mut = ushuffle.shuffle(rec.seq, args.mut_size, 2)
+                mut = utils.kshuffle(rec.seq, random_state=args.seed)[: args.mut_size]
                 mutated_seq = (
                     rec.seq[0 : pos - int(len(mut) / 2)]
                     + mut

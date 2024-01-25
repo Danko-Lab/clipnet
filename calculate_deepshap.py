@@ -9,7 +9,6 @@ import numpy as np
 import pyfastx
 import shap
 import tensorflow as tf
-import ushuffle
 
 import utils
 
@@ -68,7 +67,9 @@ def main():
             np.array(range(len(sequences))), size=args.n_subset, replace=False
         )
     ]
-    shuffled_reference = [ushuffle.shuffle(rec.seq, 1000, 2) for rec in reference]
+    shuffled_reference = [
+        utils.kshuffle(rec.seq, random_seed=args.seed) for rec in reference
+    ]
 
     # One-hot encode shuffled sequences
     onehot_reference = np.array(

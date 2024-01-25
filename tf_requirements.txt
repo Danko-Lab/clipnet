@@ -15,7 +15,6 @@ tensorflow~=2.13
 seqlogo
 setuptools
 tqdm
-ushuffle
 wheel
 # cudatoolkit~=11.8.0
 # cudnn~=8.9.2.26
