@@ -236,13 +236,13 @@ class CLIPNET:
     # Construct model ensemble.
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def construct_ensemble(self, model_dir="/home2/ayh8/ensemble_models"):
+    def construct_ensemble(self, model_dir="./ensemble_models"):
         """
         Constructs an ensemble of models. Model ensembling is done by averaging the
         tracks and quantities of each model in the ensemble.
         """
 
-        model_fps = list(Path(model_dir).glob("*.h5"))
+        model_fps = list(Path(model_dir).glob("fold_*.h5"))
         models = [
             tf.keras.models.load_model(model_fp, compile=False)
             for model_fp in model_fps
@@ -304,21 +304,7 @@ class CLIPNET:
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
         Returns [tracks, quantities].
         """
-        model_fps = Path(model_dir).glob("*.h5")
-        models = [
-            tf.keras.models.load_model(model_fp, compile=False)
-            for model_fp in model_fps
-        ]
-        for i in range(len(models)):
-            models[i]._name = f"model_{i}"
-        inputs = models[0].input
-        tracks = [models[i](inputs)[0] for i in range(len(models))]
-        quantities = [models[i](inputs)[1] for i in range(len(models))]
-        outputs = [
-            tf.keras.layers.Average()(tracks),
-            tf.keras.layers.Average()(quantities),
-        ]
-        ensemble = tf.keras.models.Model(inputs=inputs, outputs=outputs)
+        ensemble = self.construct_ensemble(model_dir)
         sequence = utils.get_onehot_fasta_sequences(fasta_fp)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
         print("Computing predictions ...")
