@@ -1,4 +1,5 @@
 biopython
+cmake
 cython
 h5py
 ghostscript
