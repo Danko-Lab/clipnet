@@ -14,7 +14,7 @@ cd clipnet
 Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using conda/mamba:
 
 ```bash
-conda create -n clipnet python=3.9 # or mamba
+conda create -n clipnet python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8# or mamba
 conda activate clipnet
 pip install -r tf_requirements.txt
 ```

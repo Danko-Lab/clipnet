@@ -1,7 +1,4 @@
 cython
-cudatoolkit~=11.8.0
-cudnn~=8.9.2.26
-cupti~=11.8.0
 gcc~=12.1
 GPUtil
 h5py
@@ -13,11 +10,6 @@ keras~=2.13
 matplotlib~=3.7
 notebook~=7.0
 numpy~=1.24
-nvidia-cublas-cu11~=11.11.3.6
-nvidia-cublas-cu12~=12.2.5.6
-nvidia-cuda-nvrtc-cu12~=12.2.140
-nvidia-cuda-runtime-cu12~=12.2.140
-nvidia-cudnn-cu11~=8.6.0.163
 pandas~=2.0
 pip
 python~=3.8

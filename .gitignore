@@ -2,6 +2,8 @@
 data/scratch.fa
 data/*.fai
 data/*.fxi
+shap_requirements_explicit.txt
+tf_requirements_explicit.txt
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Python gitignore
