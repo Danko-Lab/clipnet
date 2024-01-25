@@ -1,6 +1,6 @@
 # CLIPNET
 
-CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled convolutional neural network that predicts transcription initiation from DNA sequence at single nucleotide resolution. A preprint describing CLIPNET will be available shortly on bioRxiv. This repository contains code for working with CLIPNET, namely for generating predictions and feature interpretations. Code to reproduce the figures in our paper will be made available separately.
+CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled convolutional neural network that predicts transcription initiation from DNA sequence at single nucleotide resolution. A preprint describing CLIPNET will be available shortly on bioRxiv. This repository contains code for working with CLIPNET, namely for generating predictions and feature interpretations and performing *in silico* mutagenesis scans. Code to reproduce the figures in our paper will be made available separately.
 
 ## Installation
 
