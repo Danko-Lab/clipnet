@@ -14,7 +14,8 @@ cd clipnet
 Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using conda/mamba:
 
 ```bash
-conda create -n clipnet python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 conda-forge::gcc~=12.1 # or mamba
+# cuda needed for GPU support
+conda create -n clipnet conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
 conda activate clipnet
 pip install -r tf_requirements.txt
 ```
@@ -22,7 +23,8 @@ pip install -r tf_requirements.txt
 We had issues with conflicting package requirements when installing DeepSHAP, so we recommend installing it separately:
 
 ```bash
-conda create -n shap python=3.8 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 conda-forge::gcc~=12.1 # or mamba
+# cuda needed for GPU support
+conda create -n shap conda-forge::gcc~=12.1 python=3.8 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
 conda activate shap
 pip install -r shap_requirements.txt
 ```

@@ -11,7 +11,7 @@ pyfastx~=1.1.0
 pysam
 pip
 scipy
-tensorflow~=2.13
+tensorflow[and-cuda]~=2.14
 seqlogo
 setuptools
 tqdm
