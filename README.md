@@ -55,7 +55,8 @@ To generate predictions using the ensembled model, use the `predict_ensemble.py`
 
 ```bash
 # conda activate tf
-python predict_ensemble.py data/test.fa data/test.h5 --gpu
+python predict_ensemble.py data/test.fa data/test.h5 #--gpu
+# Use the --gpu flag to run on GPU
 ```
 
 To input individualized sequences, heterozygous positions should be represented using the IUPAC ambiguity codes R (A/G), Y (C/T), S (C/G), W (A/T), K (G/T), M (A/C).
@@ -87,15 +88,14 @@ python calculate_deepshap.py \
     data/test.fa \
     data/test_deepshap.npz \
     data/test_onehot.npz \
-    --mode quantity \
-    --gpu
+    --mode quantity 
 ```
 
 Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last.
 
 Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero.
 
-The outputs of this model can be used as input to `tfmodisco-lite` to generate motif logos and motif tracks.
+The outputs of this model can be used as inputs to `tfmodisco-lite` to generate motif logos and motif tracks. Note that both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a large number of sequences, so we (a) recommend running DeepSHAP on a GPU using the `--gpu` flag and (b) provide precomputed DeepSHAP scores and TF-MoDISco results for a genome-wide set of PRO-cap peaks called in the LCL dataset (ADD ZENODO LINK HERE).
 
 #### Genomic *in silico* mutagenesis scans
 
