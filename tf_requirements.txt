@@ -1,4 +1,4 @@
-bedtools~=2.31
+bedtools~=2.29
 bioconductor-seqlogo
 biopython
 cudatoolkit~=11.8.0
