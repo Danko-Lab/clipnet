@@ -2,6 +2,7 @@ biopython
 cython
 fastcluster
 h5py
+gcc
 ghostscript
 gputil
 joblib~=1.3
