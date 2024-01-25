@@ -1,4 +1,3 @@
-bioconductor-seqlogo
 biopython
 cudatoolkit~=11.8.0
 cudnn~=8.9.2.26
@@ -31,8 +30,8 @@ pip
 pybedtools
 samtools~=1.11
 scipy
+seqlogo
 scikit-learn
 tensorflow~=2.13.0
-seqlogo
 tqdm
 ushuffle
