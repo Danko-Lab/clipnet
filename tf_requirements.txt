@@ -7,7 +7,7 @@ gputil
 joblib~=1.3
 jupyter
 jupyterlab
-keras~=2.13.1
+keras~=2.13
 mlxtend
 notebook~=7.0
 numpy~=1.24
