@@ -10,7 +10,6 @@ pybedtools~=0.9.0
 pyfastx~=1.1.0
 pysam
 pip
-pybedtools~=0.9
 scipy
 tensorflow~=2.13
 seqlogo
