@@ -16,7 +16,6 @@ pysam
 pytest
 pip
 pybedtools~=0.9
-samtools~=1.11
 scipy~=1.10
 scikit-learn~=1.3
 tensorflow~=2.13.0
