@@ -61,10 +61,7 @@ def main():
 
     # Load models ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if args.gpu:
-        nn = clipnet.CLIPNET(n_gpus=1)
-    else:
-        nn = clipnet.CLIPNET(n_gpus=0)
+    nn = clipnet.CLIPNET(n_gpus=1) if args.gpu else clipnet.CLIPNET(n_gpus=0)
     ensemble = nn.construct_ensemble(args.model_dir)
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
