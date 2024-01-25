@@ -84,6 +84,8 @@ def main():
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         tf.config.set_visible_devices(gpus[-1], "GPU")
+    else:
+        tf.config.set_visible_devices([], "GPU")
 
     model = tf.keras.models.load_model(args.model_fp, compile=False)
     if args.mode == "quantity":

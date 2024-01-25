@@ -3,7 +3,6 @@ Calculate ISM shuffle scores.
 """
 
 import argparse
-import sys
 
 import numpy as np
 import pyfastx
@@ -12,9 +11,6 @@ from scipy.spatial.distance import cdist
 
 import clipnet
 import utils
-
-MOTIF = sys.argv[1]
-GPU_ID = int(sys.argv[2])
 
 
 def main():
@@ -65,7 +61,10 @@ def main():
 
     # Load models ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=GPU_ID)
+    if args.gpu:
+        nn = clipnet.CLIPNET(n_gpus=1)
+    else:
+        nn = clipnet.CLIPNET(n_gpus=0)
     ensemble = nn.construct_ensemble(args.model_dir)
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -89,6 +89,7 @@ python calculate_deepshap.py \
     data/test_deepshap.npz \
     data/test_onehot.npz \
     --mode quantity 
+    #--mode profile
 ```
 
 Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last.
