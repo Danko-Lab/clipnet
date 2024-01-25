@@ -106,7 +106,7 @@ To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffl
 python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
 ```
 
-#### API usage
+### API usage
 
 CLIPNET models can be directly loaded as follows. Individual models can simply be loaded using `tensorflow`:
 
