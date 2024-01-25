@@ -13,21 +13,22 @@ import clipnet
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("model_fp", type=str, help="model file path.")
     parser.add_argument("fasta_fp", type=str, help="fasta file.")
     parser.add_argument("output_fp", type=str, help="output file path.")
-    parser.add_argument("model_fp", type=str, help="model file path.")
     parser.add_argument(
         "--reverse_complement",
         action="store_true",
         help="reverse complements the input data.",
     )
-    parser.add_argument("--n_gpus", type=int, default=0, help="number of gpus to use.")
+    parser.add_argument("--gpu", action="store_true", help="enable GPU.")
     parser.add_argument(
         "--low_mem", action="store_true", help="Use smaller batch size to fit in VRAM."
     )
     args = parser.parse_args()
 
-    nn = clipnet.CLIPNET(n_gpus=args.n_gpus)
+    nn = clipnet.CLIPNET(n_gpus=1) if args.gpu else clipnet.CLIPNET(n_gpus=0)
+
     prediction = nn.predict_on_fasta(
         model_fp=args.model_fp,
         fasta_fp=args.fasta_fp,

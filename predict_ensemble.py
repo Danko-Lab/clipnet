@@ -31,13 +31,13 @@ def main():
         action="store_true",
         help="Reverse complements the input data.",
     )
-    parser.add_argument("--n_gpus", type=int, default=0, help="Number of gpus to use.")
+    parser.add_argument("--gpu", action="store_true", help="enable GPU.")
     parser.add_argument(
         "--low_mem", action="store_true", help="Predict in batches to fit in VRAM."
     )
     args = parser.parse_args()
 
-    nn = clipnet.CLIPNET(n_gpus=args.n_gpus)
+    nn = clipnet.CLIPNET(n_gpus=1) if args.gpu else clipnet.CLIPNET(n_gpus=0)
     ensemble_predictions = nn.predict_ensemble(
         model_dir=args.model_dir,
         fasta_fp=args.fasta_fp,

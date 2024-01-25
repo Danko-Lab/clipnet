@@ -54,35 +54,43 @@ We encode sequences using a "two-hot" encoding. That is, we encoded each individ
 To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_models.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
 
 ```bash
+# conda activate tf
 python predict_ensemble.py \
     data/test.fa \
     data/test.h5 \
-    #--n_gpus 1 # enable to use a single NVIDIA GPU to calculate predictions.
+    #--gpu # enable to use a single NVIDIA GPU to calculate predictions.
 ```
 
 To input individualized sequences, heterozygous positions should be represented using the IUPAC ambiguity codes R (A/G), Y (C/T), S (C/G), W (A/T), K (G/T), M (A/C).
 
-The output hdf5 file will contain two datasets: "profile" and "quantity". The profile output of the model is a length 1000 vector (500 plus strand concatenated with 500 minus strand) representing the predicted base-resolution profile/shape of initiation. The quantity output represents the total PRO-cap quantity on both strands.
+The output hdf5 file will contain two datasets: "track" and "quantity". The track output of the model is a length 1000 vector (500 plus strand concatenated with 500 minus strand) representing the predicted base-resolution profile/shape of initiation. The quantity output represents the total PRO-cap quantity on both strands.
 
-We note that the profile node was not optimized for quantity prediction, and that the sum of the profile node is not well correlated with the quantity prediction, and not a good predictor of the total quantity of initiation. We therefore recommend rescaling the profile predictions to sum to the quantity prediction. For example:
+We note that the track node was not optimized for quantity prediction, and that the sum of the track node is not well correlated with the quantity prediction, and not a good predictor of the total quantity of initiation. We therefore recommend rescaling the track predictions to sum to the quantity prediction. For example:
 
 ```python
 import h5py
 import numpy as np
 
 with h5py.File("data/test.h5", "r") as f:
-    profile = f["profile"][:]
+    profile = f["track"][:]
     quantity = f["quantity"][:]
     profile_scaled = profile * quantity[:, None] / np.sum(profile, axis=1)[:, None]
 ```
 
 #### Feature interpretations
 
-CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the feature interpretations for each record.  For example:
+CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. These files are required as input for [tfmodisco-lite](https://github.com/jmschrei/tfmodisco-lite/tree/main). Since calculating these interpretations can be quite slow when run on large datasets, this script is set up to calculate for a single model fold. This enables easy multi-GPU calculation of DeepSHAP scores, since you can just run one script on each GPU.
+
+This script supports two modes: "profile" and "quantity". The "profile" mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the "quantity" mode calculates interpretations for the quantity node of the model. For example:
 
 ```bash
+# conda activate shap
 python calculate_deepshap.py \
+    ensemble_models/fold_1.h5 \
     data/test.fa \
-    data/test_deepshap.h5 \
-    #--n_gpus 1 # enable to use a single NVIDIA GPU to calculate interpretations
+    data/test_deepshap.npz \
+    data/test_onehot.npz \
+    --mode quantity \
+    --n_subset 5
+    #--gpu # enable to use a single NVIDIA GPU to calculate interpretations
 ```
