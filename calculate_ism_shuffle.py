@@ -20,7 +20,7 @@ def main():
         "score_fp", type=str, help="Where to write ISM shuffle results."
     )
     parser.add_argument(
-        "--model_dir", type=str, default="ensembl_models", help="Model file path."
+        "--model_dir", type=str, default="ensemble_models", help="Model file path."
     )
     parser.add_argument("--gpu", action="store_true", help="Enable GPU.")
     parser.add_argument(
