@@ -24,7 +24,7 @@ We had issues with conflicting package requirements when installing DeepSHAP, so
 
 ```bash
 # cuda needed for GPU support
-conda create -n shap conda-forge::gcc~=12.1 python=3.8 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
+conda create -n shap conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
 conda activate shap
 pip install -r shap_requirements.txt
 ```
