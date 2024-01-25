@@ -99,7 +99,7 @@ The outputs of this model can be used as input to `tfmodisco-lite` to generate m
 
 #### Genomic *in silico* mutagenesis scans
 
-To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
+To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results ("corr_ism_shuffle" and "log_quantity_ism_shuffle") for each record. For example:
 
 ```bash
 # conda activate tf
