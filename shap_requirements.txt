@@ -18,3 +18,7 @@ setuptools
 shap
 tensorflow[and-cuda]~=2.14
 wheel
+# cudatoolkit~=11.8.0
+# cudnn~=8.9.2.26
+# cupti~=11.8.0
+# gcc~=12.1
