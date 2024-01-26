@@ -16,7 +16,7 @@ Then, install prerequisites using pip. We recommend creating an isolated environ
 ```bash
 # cuda needed for GPU support
 mamba create -n clipnet \
-    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or conda
+    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8
 mamba activate clipnet
 pip install -r tf_requirements.txt
 ```
@@ -26,7 +26,7 @@ We had issues with conflicting package requirements when installing DeepSHAP, so
 ```bash
 # cuda needed for GPU support
 mamba create -n shap \
-    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or conda
+    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8
 mamba activate shap
 pip install -r shap_requirements.txt
 ```
