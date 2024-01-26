@@ -11,12 +11,13 @@ git clone https://github.com/Danko-Lab/clipnet.git
 cd clipnet
 ```
 
-Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using conda/mamba:
+Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using mamba (or, equivalently, conda):
 
 ```bash
 # cuda needed for GPU support
-conda create -n clipnet conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
-conda activate clipnet
+mamba create -n clipnet \
+    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or conda
+mamba activate clipnet
 pip install -r tf_requirements.txt
 ```
 
@@ -24,8 +25,9 @@ We had issues with conflicting package requirements when installing DeepSHAP, so
 
 ```bash
 # cuda needed for GPU support
-conda create -n shap conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or mamba
-conda activate shap
+mamba create -n shap \
+    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.9 cupti~=11.8 # or conda
+mamba activate shap
 pip install -r shap_requirements.txt
 ```
 
@@ -56,7 +58,7 @@ We encode sequences using a "two-hot" encoding. That is, we encoded each individ
 To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_models.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
 
 ```bash
-# conda activate tf
+# mamba activate tf
 python predict_ensemble.py data/test.fa data/test_predictions.h5 #--gpu
 # Use the --gpu flag to run on GPU
 ```
@@ -84,7 +86,7 @@ CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature i
 This script supports two modes: "profile" and "quantity". The "profile" mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the "quantity" mode calculates interpretations for the quantity node of the model. For example:
 
 ```bash
-# conda activate shap
+# mamba activate shap
 python calculate_deepshap.py \
     ensemble_models/fold_1.h5 \
     data/test.fa \
@@ -111,7 +113,7 @@ The outputs of this model can be used as inputs to `tfmodisco-lite` to generate 
 To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results ("corr_ism_shuffle" and "log_quantity_ism_shuffle") for each record. For example:
 
 ```bash
-# conda activate tf
+# mamba activate tf
 python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
 ```
 
