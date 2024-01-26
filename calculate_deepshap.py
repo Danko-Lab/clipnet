@@ -33,6 +33,12 @@ def main():
     )
     parser.add_argument("--gpu", action="store_true", help="Enable GPU.")
     parser.add_argument(
+        "--use_specific_gpu",
+        type=int,
+        default=0,
+        help="Index of GPU to use (starting from 0). Does nothing if --gpu is not set.",
+    )
+    parser.add_argument(
         "--n_subset",
         type=int,
         default=100,
@@ -82,7 +88,7 @@ def main():
         gpus = tf.config.experimental.list_physical_devices("GPU")
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
-        tf.config.set_visible_devices(gpus[-1], "GPU")
+        tf.config.set_visible_devices(gpus[args.use_specific_gpu], "GPU")
     else:
         tf.config.set_visible_devices([], "GPU")
 

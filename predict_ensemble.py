@@ -33,11 +33,21 @@ def main():
     )
     parser.add_argument("--gpu", action="store_true", help="enable GPU.")
     parser.add_argument(
+        "--use_specific_gpu",
+        type=int,
+        default=0,
+        help="Index of GPU to use (starting from 0). Does nothing if --gpu is not set.",
+    )
+    parser.add_argument(
         "--low_mem", action="store_true", help="Predict in batches to fit in VRAM."
     )
     args = parser.parse_args()
 
-    nn = clipnet.CLIPNET(n_gpus=1) if args.gpu else clipnet.CLIPNET(n_gpus=0)
+    nn = (
+        clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.use_specific_gpu)
+        if args.gpu
+        else clipnet.CLIPNET(n_gpus=0)
+    )
     ensemble_predictions = nn.predict_ensemble(
         model_dir=args.model_dir,
         fasta_fp=args.fasta_fp,

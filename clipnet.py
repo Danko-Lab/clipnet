@@ -27,7 +27,7 @@ class CLIPNET:
     init args
     ------------
     n_gpus=1                - how many gpus to use.
-    use_specific_gpu=None   - if n_gpus==1, allows choice of specific gpu.
+    use_specific_gpu=0      - if n_gpus==1, allows choice of specific gpu.
     prefix='rnn_v10'        - prefix for nn_architecture file and the prefix the models
                               will be saved under while training.
 
@@ -42,7 +42,7 @@ class CLIPNET:
     def __init__(
         self,
         n_gpus=1,
-        use_specific_gpu=None,
+        use_specific_gpu=0,
         prefix="rnn_v10",
     ):
         self.prefix = prefix
@@ -68,10 +68,7 @@ class CLIPNET:
                 tf.config.experimental.set_memory_growth(gpu, True)
             if self.n_gpus == 1:
                 gpus = tf.config.list_physical_devices("GPU")
-                if self.use_specific_gpu is not None:
-                    gpu = gpus[self.use_specific_gpu]
-                else:
-                    gpu = gpus[GPUtil.getAvailable()[0]]
+                gpu = gpus[GPUtil.getAvailable()[0]]
                 print(f"Requested 1 GPU. Using GPU {gpu}.")
                 tf.config.set_visible_devices(gpu, "GPU")
                 self.strategy = tf.distribute.get_strategy()
