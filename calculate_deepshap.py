@@ -70,6 +70,7 @@ def main():
     shuffled_reference = [
         utils.kshuffle(rec.seq, random_seed=args.seed)[0] for rec in reference
     ]
+    print(shuffled_reference[0])
 
     # One-hot encode shuffled sequences
     onehot_reference = np.array(
