@@ -11,7 +11,7 @@ git clone https://github.com/Danko-Lab/clipnet.git
 cd clipnet
 ```
 
-Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using mamba (or equivalently, conda):
+Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using mamba (or, equivalently, conda):
 
 ```bash
 # cuda needed for GPU support
