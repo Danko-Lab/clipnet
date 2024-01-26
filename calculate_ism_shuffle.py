@@ -81,7 +81,9 @@ def main():
         for shuffle in range(args.n_shuffles):
             mutated_seqs = []
             for pos in positions:
-                mut = utils.kshuffle(rec.seq, random_state=args.seed)[: args.mut_size]
+                mut = utils.kshuffle(rec.seq, random_state=args.seed)[0][
+                    : args.mut_size
+                ]
                 mutated_seq = (
                     rec.seq[0 : pos - int(len(mut) / 2)]
                     + mut

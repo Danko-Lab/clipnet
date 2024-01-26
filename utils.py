@@ -290,7 +290,7 @@ def kshuffle(seq, num_shufs=1, k=2, random_seed=None):
     being a shuffled version of `seq`.
     """
     # Convert the sequence (string) into a 1D array of numbers (for simplicity)
-    if type(seq) is str:
+    if isinstance(seq, str):
         arr = string_to_char_array(seq)
     else:
         raise ValueError("Expected string or one-hot encoded array")
@@ -302,10 +302,7 @@ def kshuffle(seq, num_shufs=1, k=2, random_seed=None):
         all_results = []
         for i in range(num_shufs):
             rng.shuffle(arr)
-            if type(seq) is str:
-                all_results.append(char_array_to_string(arr))
-            else:
-                all_results[i] = tokens_to_one_hot(arr, one_hot_dim)
+            all_results.append(char_array_to_string(arr))
         return all_results
 
     # Tile `arr` from a 1D array to a 2D array of all (k-1)-mers (i.e.
