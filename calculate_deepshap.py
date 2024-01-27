@@ -134,7 +134,9 @@ def main():
     batch_size = 256
     for i, explainer in enumerate(explainers):
         for j in range(0, len(seqs_to_explain), batch_size):
-            print(f"Calculating scores for input sequences {j} to {j+batch_size}")
+            print(
+                f"Calculating for sequences {j}:{max(j+batch_size, len(seqs_to_explain))}"
+            )
             raw_explanations[i].append(
                 explainer.shap_values(seqs_to_explain[j : j + batch_size])
             )
@@ -145,6 +147,7 @@ def main():
         concat_explanations.append(
             np.concatenate([exp for exp in raw_exp], axis=1).sum(axis=0)
         )
+        print(concat_explanations[-1].shape)
 
     mean_explanations = np.array(concat_explanations).mean(axis=0)
     scaled_explanations = mean_explanations * seqs_to_explain
