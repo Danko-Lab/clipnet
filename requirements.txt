@@ -16,7 +16,7 @@ pysam~=0.21.0
 pip
 scipy~=1.10
 shap
-tensorflow[and-cuda]~=2.14
+tensorflow[and-cuda]==2.14.0
 seqlogo
 tqdm
 # cudatoolkit~=11.8.0
