@@ -14,8 +14,8 @@ cd clipnet
 Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. CUDA, cudatoolkit, and cudnn must also be installed for GPU support. We used conda/mamba, but compiling from source should also work. `tensorflow>=2.14` also supports direct installation of the CUDA suite, but we had issues getting it to work, so here we install CUDA separately with conda/mamba and then installing `tensorflow==2.13.0` with pip.
 
 ```bash
-mamba create -n clipnet \
-    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.6 cupti~=11.8
+mamba create -n clipnet -c conda-forge \
+    gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn==8.6 cupti~=11.8
 mamba activate clipnet
 pip install -r requirements.txt
 ```
