@@ -137,9 +137,7 @@ def main():
             print(
                 f"Calculating for sequences {j} to {min(j+batch_size, len(seqs_to_explain))}"
             )
-            shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])
-            print(len(shap_values))
-            print(shap_values[0].shape)
+            shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])[0]
             raw_explanations[i].append(shap_values)
             gc.collect()
 
