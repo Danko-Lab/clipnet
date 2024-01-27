@@ -146,12 +146,10 @@ def main():
     print("raw_explanations[0]", len(raw_explanations[0]))
 
     concat_explanations = []
-    for raw_exp in raw_explanations:
+    for k in raw_explanations.keys():
         concat_explanations.append(
-            np.concatenate([exp for exp in raw_exp], axis=1).sum(axis=0)
+            np.concatenate([exp for exp in raw_explanations[k]], axis=1).sum(axis=0)
         )
-        print(len(raw_exp))
-        print(concat_explanations[-1].shape)
 
     mean_explanations = np.array(concat_explanations).mean(axis=0)
     scaled_explanations = mean_explanations * seqs_to_explain
