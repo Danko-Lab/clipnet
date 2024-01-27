@@ -11,12 +11,11 @@ git clone https://github.com/Danko-Lab/clipnet.git
 cd clipnet
 ```
 
-Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. For example, using mamba (or, equivalently, conda):
+Then, install prerequisites using pip. We recommend creating an isolated environment for working with CLIPNET. CUDA, cudatoolkit, and cudnn must also be installed for GPU support. We used conda/mamba, but compiling from source should also work. `tensorflow>=2.14` also supports direct installation of the CUDA suite, but we had issues getting it to work, so here we install CUDA separately with conda/mamba and then installing `tensorflow==2.13.0` with pip.
 
 ```bash
-# Main requirements.txt assumes you have CUDA installed and configured correctly.
-# For CPU-only install, use requirements_cpu.txt instead.
-mamba create -n clipnet python=3.9
+mamba create -n clipnet \
+    conda-forge::gcc~=12.1 python=3.9 cudatoolkit~=11.8 cudnn~=8.6 cupti~=11.8
 mamba activate clipnet
 pip install -r requirements.txt
 ```
@@ -25,7 +24,8 @@ We had issues with conflicting package requirements when installing DeepSHAP, so
 
 ```bash
 # cuda needed for GPU support
-mamba create -n shap python=3.9 
+mamba create -n shap \
+    conda-forge::gcc~=12.1 python=3.9 
 mamba activate shap
 pip install -r shap_requirements.txt
 ```
