@@ -147,7 +147,7 @@ def main():
         concat_explanations.append(
             np.concatenate([exp for exp in raw_exp], axis=1).sum(axis=0)
         )
-        print(raw_exp.shape)
+        print(len(raw_exp))
         print(concat_explanations[-1].shape)
 
     mean_explanations = np.array(concat_explanations).mean(axis=0)
