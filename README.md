@@ -78,7 +78,6 @@ This script supports two modes: "profile" and "quantity". The "profile" mode cal
 ```bash
 # mamba activate shap
 python calculate_deepshap.py \
-    ensemble_models/fold_1.h5 \
     data/test.fa \
     data/test_deepshap_quantity.npz \
     data/test_onehot.npz \
@@ -86,7 +85,6 @@ python calculate_deepshap.py \
     --gpu
 
 python calculate_deepshap.py \
-    ensemble_models/fold_1.h5 \
     data/test.fa \
     data/test_deepshap_profile.npz \
     data/test_onehot.npz \
@@ -94,11 +92,9 @@ python calculate_deepshap.py \
     --gpu
 ```
 
-Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last.
+Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000). To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. The outputs of this model can be used as inputs to `tfmodisco-lite` to generate motif logos and motif tracks.
 
-Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero.
-
-The outputs of this model can be used as inputs to `tfmodisco-lite` to generate motif logos and motif tracks. Note that both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a large number of sequences, so we (a) recommend running DeepSHAP on a GPU using the `--gpu` flag and (b) provide precomputed DeepSHAP scores and TF-MoDISco results for a genome-wide set of PRO-cap peaks called in the LCL dataset (ADD ZENODO LINK HERE).
+Both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a large number of sequences, so we (a) recommend running DeepSHAP on a GPU using the `--gpu` flag and (b) if you have access to many GPUs, calculate DeepSHAP scores for each model fold in parallel using the `--model_fp` flag, then averaging them. We also provide precomputed DeepSHAP scores and TF-MoDISco results for a genome-wide set of PRO-cap peaks called in the LCL dataset (ADD ZENODO LINK HERE).
 
 #### Genomic *in silico* mutagenesis scans
 
