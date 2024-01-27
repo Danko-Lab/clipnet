@@ -133,12 +133,13 @@ def main():
     raw_explanations = [[]] * len(explainers)
     batch_size = 256
     for i, explainer in enumerate(explainers):
+        print(i)
         for j in range(0, len(seqs_to_explain), batch_size):
+            print(j)
             print(
                 f"Calculating for sequences {j} to {min(j+batch_size, len(seqs_to_explain))}"
             )
             shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])[0]
-            print(shap_values.shape)
             raw_explanations[i].append(shap_values)
             gc.collect()
     print(len(raw_explanations))
