@@ -135,15 +135,10 @@ def main():
     for i in range(len(explainers)):
         print(len(raw_explanations[i]))
         for j in range(0, len(seqs_to_explain), batch_size):
-            print(
-                f"Calculating for sequences {j} to {min(j+batch_size, len(seqs_to_explain))}"
-            )
             shap_values = explainers[i].shap_values(seqs_to_explain[j : j + batch_size])
             raw_explanations[i].append(shap_values[0])
             print(len(raw_explanations[i]))
             gc.collect()
-    print("raw_explanations", len(raw_explanations))
-    print("raw_explanations[0]", len(raw_explanations[0]))
 
     concat_explanations = []
     for k in raw_explanations.keys():
@@ -151,12 +146,11 @@ def main():
             np.concatenate([exp for exp in raw_explanations[k]], axis=1).sum(axis=0)
         )
 
+    print(np.array(concat_explanations).shape)
     mean_explanations = np.array(concat_explanations).mean(axis=0)
     scaled_explanations = mean_explanations * seqs_to_explain
 
     # Save scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    print(f"Finished calculating scores for model: {str(args.model_fp)}")
 
     np.savez_compressed(args.score_fp, scaled_explanations.swapaxes(1, 2))
     np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
