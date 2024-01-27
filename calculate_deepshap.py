@@ -130,13 +130,13 @@ def main():
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    raw_explanations = [] * len(explainers)
+    raw_explanations = [[]] * len(explainers)
     batch_size = 256
     for i, explainer in enumerate(explainers):
-        for i in range(0, len(seqs_to_explain), batch_size):
-            print(f"Calculating scores for input sequences {i} to {i+batch_size}")
+        for j in range(0, len(seqs_to_explain), batch_size):
+            print(f"Calculating scores for input sequences {j} to {j+batch_size}")
             raw_explanations[i].append(
-                explainer.shap_values(seqs_to_explain[i : i + batch_size])
+                explainer.shap_values(seqs_to_explain[j : j + batch_size])
             )
             gc.collect()
 
