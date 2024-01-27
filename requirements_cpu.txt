@@ -15,11 +15,9 @@ pyfastx~=1.1
 pysam~=0.21.0
 pip
 scipy~=1.10
-tensorflow[and-cuda]~=2.14
+tensorflow~=2.14
 seqlogo
-setuptools
 tqdm
-wheel
 # cudatoolkit~=11.8.0
 # cudnn~=8.9.2.26
 # cupti~=11.8.0
