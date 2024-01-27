@@ -132,7 +132,7 @@ def main():
 
     raw_explanations = [] * len(explainers)
     batch_size = 256
-    for i, explainer in explainers:
+    for i, explainer in enumerate(explainers):
         for i in range(0, len(seqs_to_explain), batch_size):
             print(f"Calculating scores for input sequences {i} to {i+batch_size}")
             raw_explanations[i].append(
