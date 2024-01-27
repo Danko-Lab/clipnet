@@ -135,7 +135,7 @@ def main():
     for i, explainer in enumerate(explainers):
         for j in range(0, len(seqs_to_explain), batch_size):
             print(
-                f"Calculating for sequences {j}:{min(j+batch_size, len(seqs_to_explain))}"
+                f"Calculating for sequences {j} to {min(j+batch_size, len(seqs_to_explain))}"
             )
             raw_explanations[i].append(
                 explainer.shap_values(seqs_to_explain[j : j + batch_size])
