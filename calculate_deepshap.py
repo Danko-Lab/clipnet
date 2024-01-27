@@ -130,7 +130,7 @@ def main():
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    raw_explanations = [[]] * len(explainers)
+    raw_explanations = {i: [] for i in range(len(explainers))}
     batch_size = 256
     for i in range(len(explainers)):
         print(len(raw_explanations[i]))
