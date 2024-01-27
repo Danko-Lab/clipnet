@@ -21,10 +21,22 @@ tf.compat.v1.disable_v2_behavior()
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("model_fp", type=str, help="Model file path.")
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
     parser.add_argument("score_fp", type=str, help="Where to write DeepSHAP scores.")
     parser.add_argument("seq_fp", type=str, help="Where to write onehot sequences.")
+    parser.add_argument(
+        "--model_dir",
+        type=str,
+        default="ensemble_models",
+        help="Directory to load models from",
+    )
+    parser.add_argument(
+        "--model_fp",
+        type=str,
+        default=None,
+        help="Model file path. Use to calculate for a specific model fold. \
+            Selecting this option will override --model_dir.",
+    )
     parser.add_argument(
         "--mode",
         type=str,
@@ -92,30 +104,50 @@ def main():
     else:
         tf.config.set_visible_devices([], "GPU")
 
-    model = tf.keras.models.load_model(args.model_fp, compile=False)
-    if args.mode == "quantity":
-        contrib = model.output[1]
+    if args.model_fp is None:
+        models = [
+            tf.keras.models.load_model(f"{args.model_dir}/fold_{i}.h5", compile=False)
+            for i in range(1, 10)
+        ]
     else:
-        contrib = tf.reduce_mean(
-            tf.stop_gradient(tf.nn.softmax(model.output[0], axis=-1)) * model.output[0],
-            axis=-1,
-            keepdims=True,
-        )
-    explainer = shap.DeepExplainer((model.input, contrib), onehot_reference)
+        models = [tf.keras.models.load_model(args.model_fp, compile=False)]
+    if args.mode == "quantity":
+        contrib = [model.output[1] for model in models]
+    else:
+        contrib = [
+            tf.reduce_mean(
+                tf.stop_gradient(tf.nn.softmax(model.output[0], axis=-1))
+                * model.output[0],
+                axis=-1,
+                keepdims=True,
+            )
+            for model in models
+        ]
+    explainers = [
+        shap.DeepExplainer((model.input, contrib), onehot_reference)
+        for (model, contrib) in zip(models, contrib)
+    ]
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    raw_explanations = []
+    raw_explanations = [] * len(explainers)
     batch_size = 256
-    for i in range(0, len(seqs_to_explain), batch_size):
-        print(f"Calculating scores for input sequences {i} to {i+batch_size}")
-        raw_explanations.append(
-            explainer.shap_values(seqs_to_explain[i : i + batch_size])
-        )
-        gc.collect()
+    for i, explainer in explainers:
+        for i in range(0, len(seqs_to_explain), batch_size):
+            print(f"Calculating scores for input sequences {i} to {i+batch_size}")
+            raw_explanations[i].append(
+                explainer.shap_values(seqs_to_explain[i : i + batch_size])
+            )
+            gc.collect()
 
-    concat_exp = np.concatenate([exp for exp in raw_explanations], axis=1).sum(axis=0)
-    scaled_explanations = concat_exp * seqs_to_explain
+    concat_explanations = []
+    for raw_exp in raw_explanations:
+        concat_explanations.append(
+            np.concatenate([exp for exp in raw_exp], axis=1).sum(axis=0)
+        )
+
+    mean_explanations = np.array(concat_explanations).mean(axis=0)
+    scaled_explanations = mean_explanations * seqs_to_explain
 
     # Save scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
