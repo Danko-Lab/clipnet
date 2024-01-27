@@ -136,7 +136,7 @@ def main():
         print(len(raw_explanations[i]))
         for j in range(0, len(seqs_to_explain), batch_size):
             shap_values = explainers[i].shap_values(seqs_to_explain[j : j + batch_size])
-            raw_explanations[i].append(shap_values[0])
+            raw_explanations[i].append(shap_values)
             print(len(raw_explanations[i]))
             gc.collect()
 
