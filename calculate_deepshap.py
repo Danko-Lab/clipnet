@@ -140,6 +140,8 @@ def main():
             shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])[0]
             raw_explanations[i].append(shap_values)
             gc.collect()
+    print(len(raw_explanations))
+    print(len(raw_explanations[0]))
 
     concat_explanations = []
     for raw_exp in raw_explanations:
