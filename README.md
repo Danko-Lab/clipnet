@@ -71,7 +71,7 @@ with h5py.File("data/test.h5", "r") as f:
 
 #### Feature interpretations
 
-CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. These files are required as input for [`tfmodisco-lite`](https://github.com/jmschrei/tfmodisco-lite/tree/main). Since calculating these interpretations can be quite slow when run on large datasets, this script is set up to calculate for a single model fold. This enables easy multi-GPU calculation of DeepSHAP scores, since you can just run one script on each GPU.
+CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. These files are required as input for [tfmodisco-lite](https://github.com/jmschrei/tfmodisco-lite/tree/main). Since calculating these interpretations can be quite slow when run on large datasets, this script is set up to calculate for a single model fold. This enables easy multi-GPU calculation of DeepSHAP scores, since you can just run one script on each GPU.
 
 This script supports two modes: "profile" and "quantity". The "profile" mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the "quantity" mode calculates interpretations for the quantity node of the model. For example:
 
