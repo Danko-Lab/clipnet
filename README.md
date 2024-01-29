@@ -88,7 +88,7 @@ python calculate_deepshap.py \
     --gpu
 ```
 
-Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. `tfmodisco-lite` also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000), with the sequence array being one-hot. To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. The outputs of this model can be used as inputs to `tfmodisco-lite` to generate motif logos and motif tracks.
+Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. tfmodisco-lite also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000), with the sequence array being one-hot. To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. The outputs of this model can be used as inputs to tfmodisco-lite to generate motif logos and motif tracks.
 
 Both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a large number of sequences, so we (a) recommend running DeepSHAP on a GPU using the `--gpu` flag and (b) if you have access to many GPUs, calculating DeepSHAP scores for the model folds in parallel using the `--model_fp` flag, then averaging them. We also provide precomputed DeepSHAP scores and TF-MoDISco results for a genome-wide set of PRO-cap peaks called in the LCL dataset (ADD ZENODO LINK HERE).
 
@@ -102,7 +102,7 @@ python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
 
 ### API usage
 
-CLIPNET models can be directly loaded as follows. Individual models can simply be loaded using `tensorflow`:
+CLIPNET models can be directly loaded as follows. Individual models can simply be loaded using tensorflow:
 
 ```python
 import tensorflow as tf
