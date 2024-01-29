@@ -1,5 +1,5 @@
 """
-Calculate profile attribution scores using shap.DeepExplainer.
+Calculate contribution scores using shap.DeepExplainer.
 """
 
 import argparse
