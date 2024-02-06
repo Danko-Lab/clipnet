@@ -352,3 +352,14 @@ def kshuffle(seq, num_shufs=1, k=2, random_seed=None):
 
         all_results.append(char_array_to_string(shuffled_arr))
     return all_results
+
+
+def save_dict_to_hdf5(file, group, data, compression="gzip"):
+    for key, value in data.items():
+        if isinstance(value, dict):
+            subgroup = group.create_group(key)
+            save_dict_to_hdf5(file, subgroup, value)
+        else:
+            file.create_dataset(
+                f"{group.name}/{key}", data=value, compression=compression
+            )
