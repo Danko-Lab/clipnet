@@ -68,7 +68,13 @@ class CLIPNET:
                 tf.config.experimental.set_memory_growth(gpu, True)
             if self.n_gpus == 1:
                 gpus = tf.config.list_physical_devices("GPU")
-                gpu = gpus[GPUtil.getAvailable()[0]]
+                if self.use_specific_gpu:
+                    assert self.use_specific_gpu < len(
+                        gpus
+                    ), f"Requested GPU index {self.use_specific_gpu} does not exist."
+                    gpu = gpus[self.use_specific_gpu]
+                else:
+                    gpu = gpus[GPUtil.getAvailable()[0]]
                 print(f"Requested 1 GPU. Using GPU {gpu}.")
                 tf.config.set_visible_devices(gpu, "GPU")
                 self.strategy = tf.distribute.get_strategy()
