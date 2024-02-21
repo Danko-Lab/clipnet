@@ -68,7 +68,7 @@ class CLIPNET:
                 tf.config.experimental.set_memory_growth(gpu, True)
             if self.n_gpus == 1:
                 gpus = tf.config.list_physical_devices("GPU")
-                if self.use_specific_gpu:
+                if self.use_specific_gpu is not None:
                     assert self.use_specific_gpu < len(
                         gpus
                     ), f"Requested GPU index {self.use_specific_gpu} does not exist."
