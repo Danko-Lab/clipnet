@@ -8,7 +8,7 @@ import custom_loss
 # model fitting hyperparameters
 epochs = 200
 patience = 10
-batch_size = 256
+batch_size = 32
 
 # compile parameters
 optimizer = tf.keras.optimizers.Adam
@@ -22,7 +22,7 @@ loss = {"shape": "CosineSimilarity", "sum": "msle"}
 metrics = {"shape": custom_loss.corr}
 
 # model architecture hyperparameters
-n_filters = 256
+n_filters = 200
 c1_kernel_size = 21
 dc_kernel_size = 75
 dropout = 0.3
