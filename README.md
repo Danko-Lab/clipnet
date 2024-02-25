@@ -118,7 +118,7 @@ sys.path.append(PATH_TO_THIS_DIRECTORY)
 import clipnet
 import utils
 
-nn = clipnet.CLIPNET(n_gpus=0) # by default, this will be 1 and will attempt to start a CUDA session
+nn = clipnet.CLIPNET(n_gpus=0) # by default, this will be 1 and will use CUDA
 ensemble = nn.construct_ensemble()
 seqs = utils.twohot_fasta("data/test.fa")
 
