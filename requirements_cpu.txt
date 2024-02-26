@@ -19,7 +19,3 @@ shap
 tensorflow==2.14.0
 seqlogo
 tqdm
-# cudatoolkit~=11.8.0
-# cudnn~=8.9.2.26
-# cupti~=11.8.0
-# gcc~=12.1
