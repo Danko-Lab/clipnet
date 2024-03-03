@@ -56,7 +56,7 @@ To input individualized sequences, heterozygous positions should be represented 
 
 The output hdf5 file will contain two datasets: "track" and "quantity". The track output of the model is a length 1000 vector (500 plus strand concatenated with 500 minus strand) representing the predicted base-resolution profile/shape of initiation. The quantity output represents the total PRO-cap quantity on both strands.
 
-We note that the track node was not optimized for quantity prediction. As a result, the sum of the track node is not well correlated with the quantity prediction and anot a good predictor of the total quantity of initiation. We therefore recommend rescaling the track predictions to sum to the quantity prediction. For example:
+We note that the track node was not optimized for quantity prediction. As a result, the sum of the track node is not well correlated with the quantity prediction and not a good predictor of the total quantity of initiation. We therefore recommend rescaling the track predictions to sum to the quantity prediction. For example:
 
 ```python
 import h5py
