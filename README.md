@@ -45,7 +45,7 @@ We encode sequences using a "two-hot" encoding. That is, we encoded each individ
 
 #### Predictions
 
-To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_models.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
+To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_model.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
 
 ```bash
 python predict_ensemble.py data/test.fa data/test_predictions.h5 --gpu
