@@ -1,5 +1,5 @@
 """
-A callback function to record time spend training per epoch.
+A callback function to record time spent training per epoch.
 """
 
 import time
