@@ -73,7 +73,7 @@ def construct_nn(input_length, output_length):
     # shape / probability distribution head
     p_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
     p_head = layers.Flatten()(y)
-    p_head = layers.Dense(output_length, "shape")(p_head)
+    p_head = layers.Dense(output_length, name="shape")(p_head)
     # p_head = layers.BatchNormalization()(p_head)
     # p_head = layers.Activation("relu")(p_head)
     # p_head = layers.Dropout(dropout, name="shape")(p_head)
