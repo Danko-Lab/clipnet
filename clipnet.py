@@ -97,9 +97,7 @@ class CLIPNET:
         self.json_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_architecture.json"
         )
-        self.model_filepath = os.path.join(
-            self.model_dir, "%s_epoch{epoch:02d}-loss{val_loss:.4f}.hdf5" % self.prefix
-        )
+        self.model_filepath = os.path.join(self.model_dir, "%s_best.hdf5" % self.prefix)
         self.history_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_history.json"
         )
@@ -178,8 +176,7 @@ class CLIPNET:
                 )
                 model = self.fit_model
                 self.model_filepath = os.path.join(
-                    self.model_dir,
-                    f"{self.prefix}_epoch{{epoch:02d}}-loss{{val_loss:.4f}}_resume.hdf5",
+                    self.model_dir, f"{self.prefix}_resume_best.hdf5"
                 )
             else:
                 model = self.nn.construct_nn(
