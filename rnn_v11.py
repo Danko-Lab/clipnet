@@ -59,7 +59,7 @@ def construct_nn(input_length, output_length):
     X = layers.Input(shape=(input_length, 4))
     # y = layers.BatchNormalization()(X)
     # 1st convolutional layer
-    y = layers.Conv1D(filters=n_filters, kernel_size=c1_kernel_size)(y)
+    y = layers.Conv1D(filters=n_filters, kernel_size=c1_kernel_size)(X)
     # y = layers.BatchNormalization()(y)
     y = layers.Activation("elu")(y)
     # y = layers.MaxPooling1D(pool_size=(2))(y)
