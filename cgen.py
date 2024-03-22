@@ -86,6 +86,8 @@ class CGen(tf.keras.utils.Sequence):
         self.rc_augmentation = rc_augmentation
         self.intershuffle = intershuffle
         self.intrashuffle = intrashuffle
+        self.foldi = 0
+        self.stepi = 0
         self.on_epoch_end()
 
     def __len__(self):
