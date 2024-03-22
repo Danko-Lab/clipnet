@@ -97,7 +97,7 @@ class CLIPNET:
         self.json_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_architecture.json"
         )
-        self.model_filepath = os.path.join(self.model_dir, "%s_best.hdf5" % self.prefix)
+        # self.model_filepath = os.path.join(self.model_dir, "%s_best.hdf5" % self.prefix)
         self.history_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_history.json"
         )
