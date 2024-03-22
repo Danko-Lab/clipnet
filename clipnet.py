@@ -93,11 +93,18 @@ class CLIPNET:
         self.n_gpus = n_gpus
         self.__gpu_settings()
 
-    def __set_model_locations(self):
+    def __set_model_locations(self, resume_checkpoint=None):
         self.json_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_architecture.json"
         )
-        # self.model_filepath = os.path.join(self.model_dir, "%s_best.hdf5" % self.prefix)
+        if resume_checkpoint is not None:
+            self.model_filepath = os.path.join(
+                self.model_dir, f"{self.prefix}_best.hdf5"
+            )
+        else:
+            self.model_filepath = os.path.join(
+                self.model_dir, f"{self.prefix}_resume_best.hdf5"
+            )
         self.history_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_history.json"
         )
@@ -136,7 +143,7 @@ class CLIPNET:
         self.dataset_params_fp = dataset_params_fp
         with open(os.path.join(model_dir, dataset_params_fp), "r") as handle:
             self.dataset_params = json.load(handle)
-        self.__set_model_locations()
+        self.__set_model_locations(resume_checkpoint=resume_checkpoint)
         with self.strategy.scope():
             # adjust learning rate by n_gpus
             (
