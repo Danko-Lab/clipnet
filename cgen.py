@@ -78,7 +78,7 @@ class CGen(tf.keras.utils.Sequence):
         self.procap_folds = procap_folds
         self.fold_list = np.arange(len(self.seq_folds))
         print(f"Loaded {len(self.fold_list)} folds.")
-        # print(self.fold_list)
+        print(self.fold_list)
         self.steps_per_epoch = steps_per_epoch
         self.batch_size = batch_size
         self.pad = pad
