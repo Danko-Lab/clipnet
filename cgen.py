@@ -134,7 +134,7 @@ class CGen(tf.keras.utils.Sequence):
         # Reset batchi
         self.batchi = 0
         # Increment fold counter (foldi gets reset by on_epoch_end)
-        self.foldi += 1
+        self.foldi = min(len(self.fold_list), self.foldi + 1)
 
     def __getitem__(self, index):
         """
