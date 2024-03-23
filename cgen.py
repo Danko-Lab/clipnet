@@ -77,9 +77,9 @@ class CGen(tf.keras.utils.Sequence):
         self.seq_folds = seq_folds
         self.procap_folds = procap_folds
         self.fold_list = np.arange(len(self.seq_folds))
-        print(self.seq_folds)
-        print(f"Loaded {len(self.fold_list)} folds.")
-        print(self.fold_list)
+        # print(self.seq_folds)
+        # print(f"Loaded {len(self.fold_list)} folds.")
+        # print(self.fold_list)
         self.steps_per_epoch = steps_per_epoch
         self.batch_size = batch_size
         self.pad = pad
@@ -105,7 +105,7 @@ class CGen(tf.keras.utils.Sequence):
         """Loads data from fold at foldi index"""
         assert hasattr(self, "foldi"), "foldi is undefined when trying to load fold."
         # Get filepaths from list
-        print(self.fold_list)
+        # print(self.fold_list)
         rand_foldi = self.fold_list[self.foldi]
         seq_fold_fp = self.seq_folds[rand_foldi]
         procap_fold_fp = self.procap_folds[rand_foldi]

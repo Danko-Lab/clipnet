@@ -97,7 +97,7 @@ class CLIPNET:
         self.json_filepath = os.path.join(
             self.model_dir, f"{self.prefix}_architecture.json"
         )
-        if resume_checkpoint is not None:
+        if resume_checkpoint is None:
             self.model_filepath = os.path.join(
                 self.model_dir, f"{self.prefix}_best.hdf5"
             )
