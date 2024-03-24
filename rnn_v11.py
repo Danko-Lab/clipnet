@@ -78,8 +78,8 @@ def construct_nn(input_length, output_length):
     p_head = layers.Activation("relu", name="shape")(p_head)
     # p_head = layers.Dropout(dropout, name="shape")(p_head)
     # sum head
-    # s_head = layers.GlobalAvgPool1D()(y)
-    s_head = layers.Flatten()(y)
+    s_head = layers.GlobalAvgPool1D()(y)
+    s_head = layers.Flatten()(s_head)
     s_head = layers.Dense(1)(s_head)
     # s_head = layers.BatchNormalization()(s_head)
     s_head = layers.Activation("relu", name="sum")(s_head)
