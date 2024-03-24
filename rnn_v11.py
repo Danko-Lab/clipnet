@@ -24,7 +24,7 @@ metrics = {"shape": custom_loss.corr}
 # model architecture hyperparameters
 n_filters = 64
 c1_kernel_size = 21
-dc_kernel_size = 75
+# dc_kernel_size = 75
 # dropout = 0.3
 
 num_dilations = 9
@@ -71,8 +71,8 @@ def construct_nn(input_length, output_length):
         )
     # y = layers.MaxPooling1D(pool_size=(2))(y)
     # shape / probability distribution head
-    p_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
-    p_head = layers.Flatten()(p_head)
+    # p_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
+    p_head = layers.Flatten()(y)
     p_head = layers.Dense(output_length)(p_head)
     # p_head = layers.BatchNormalization()(p_head)
     p_head = layers.Activation("relu", name="shape")(p_head)
