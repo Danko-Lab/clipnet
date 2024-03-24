@@ -72,16 +72,15 @@ def construct_nn(input_length, output_length):
     # y = layers.MaxPooling1D(pool_size=(2))(y)
     # shape / probability distribution head
     p_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
-    p_head = layers.Flatten()(y)
+    p_head = layers.Flatten()(p_head)
     p_head = layers.Dense(output_length)(p_head)
     # p_head = layers.BatchNormalization()(p_head)
     p_head = layers.Activation("relu", name="shape")(p_head)
     # p_head = layers.Dropout(dropout, name="shape")(p_head)
     # sum head
     # s_head = layers.GlobalAvgPool1D()(y)
-    s_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
     s_head = layers.Flatten()(y)
-    s_head = layers.Dense(1)(y)
+    s_head = layers.Dense(1)(s_head)
     # s_head = layers.BatchNormalization()(s_head)
     s_head = layers.Activation("relu", name="sum")(s_head)
     # s_head = layers.Dropout(dropout, name="sum")(s_head)
