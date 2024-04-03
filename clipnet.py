@@ -281,12 +281,12 @@ class CLIPNET:
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
         Returns [tracks, quantities].
         """
+        sequence = utils.get_onehot_fasta_sequences(fasta_fp)
+        X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
         if os.path.isdir(model_fp):
             model = self.construct_ensemble(model_fp)
         else:
             model = tf.keras.models.load_model(model_fp, compile=False)
-        sequence = utils.get_onehot_fasta_sequences(fasta_fp)
-        X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
         if low_mem:
             batch_size = self.nn.batch_size
             y_predict_handle = [

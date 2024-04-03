@@ -75,7 +75,7 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_to_explain = np.array([utils.OneHotDNA(seq).onehot for seq in sequences])
+    seqs_to_explain = utils.get_onehot_fasta_sequences(args.fasta_fp)
 
     # Perform dinucleotide shuffle on n_subset random sequences
     if len(sequences) < args.n_subset:
