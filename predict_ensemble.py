@@ -46,7 +46,7 @@ def main():
         else clipnet.CLIPNET(n_gpus=0)
     )
     ensemble_predictions = nn.predict_on_fasta(
-        model_dir=args.model_dir,
+        model_fp=args.model_dir,
         fasta_fp=args.fasta_fp,
         reverse_complement=args.reverse_complement,
         low_mem=True,
