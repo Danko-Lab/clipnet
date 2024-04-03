@@ -138,7 +138,9 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
     Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
     array of all sequences.
     """
-    seqs = [rec.seq for rec in tqdm(pyfastx.Fasta(fasta_fp), desc="Reading sequences")]
+    seqs = [
+        rec.seq for rec in tqdm.tqdm(pyfastx.Fasta(fasta_fp), desc="Reading sequences")
+    ]
     if cores > 1:
         # Use multiprocessing to parallelize onehot encoding
         import multiprocessing as mp
