@@ -292,7 +292,7 @@ class CLIPNET:
         if low_mem:
             batch_size = self.nn.batch_size
             y_predict_handle = [
-                model.predict(X[i : i + batch_size, :, :], training=False, verbose=0)
+                model.predict(X[i : i + batch_size, :, :], verbose=0)
                 for i in tqdm.tqdm(range(0, X.shape[0], batch_size), desc=desc)
             ]
             y_predict = [
