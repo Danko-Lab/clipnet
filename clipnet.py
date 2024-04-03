@@ -276,7 +276,7 @@ class CLIPNET:
         model_fp,
         fasta_fp,
         reverse_complement=False,
-        low_mem=True,
+        low_mem=False,
         desc="Predicting",
     ):
         """
@@ -292,7 +292,7 @@ class CLIPNET:
         if low_mem:
             batch_size = self.nn.batch_size
             y_predict_handle = [
-                model.predict(X[i : i + batch_size, :, :], verbose=0)
+                model(X[i : i + batch_size, :, :], training=False)
                 for i in tqdm.tqdm(range(0, X.shape[0], batch_size), desc=desc)
             ]
             y_predict = [
