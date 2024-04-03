@@ -2,11 +2,12 @@
 Calculate contribution scores using shap.DeepExplainer.
 """
 
-import argparse
-import gc
 import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # or any {'0', '1', '2'}
+
+import argparse
+import gc
 
 import numpy as np
 import pyfastx
