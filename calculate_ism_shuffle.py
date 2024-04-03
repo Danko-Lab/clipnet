@@ -81,7 +81,7 @@ def main():
 
     # Calculate ISM shuffle scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    wt_pred = ensemble.predict(seqs_onehot)
+    wt_pred = ensemble.predict(seqs_onehot, batch_size=256, verbose=0)
     corr_scores = []
     log_quantity_scores = []
     for i in tqdm.tqdm(range(len(sequences)), desc="Calculating ISM shuffle scores"):
