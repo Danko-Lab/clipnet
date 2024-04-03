@@ -5,6 +5,7 @@ Important helper functions for clipnet_generator.
 import gzip
 import os
 import re
+import tqdm
 
 import numpy as np
 import pyfastx
@@ -137,17 +138,17 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
     Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
     array of all sequences.
     """
-    seqs = [rec.seq for rec in pyfastx.Fasta(fasta_fp)]
+    seqs = [rec.seq for rec in tqdm(pyfastx.Fasta(fasta_fp), desc="Reading sequences")]
     if cores > 1:
         # Use multiprocessing to parallelize onehot encoding
         import multiprocessing as mp
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
-        parallelized = pool.map(get_onehot, seqs)
-        onehot_encoded = np.array([p for p in parallelized])
+        parallelized = pool.imap(get_onehot, seqs)
+        onehot_encoded = []
     else:
-        onehot_encoded = np.array([OneHotDNA(seq).onehot for seq in seqs])
-    return onehot_encoded
+        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm(seqs)]
+    return np.array(onehot_encoded)
 
 
 def twohot_fasta(fasta_fp, cores=16):

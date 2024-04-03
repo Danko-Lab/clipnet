@@ -9,13 +9,14 @@ import numpy as np
 import pyfastx
 import shap
 import tensorflow as tf
+import tqdm
 
 import utils
 
 # This will fix an error message for running tf.__version__==2.5
-shap.explainers._deep.deep_tf.op_handlers[
-    "AddV2"
-] = shap.explainers._deep.deep_tf.passthrough
+shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
+    shap.explainers._deep.deep_tf.passthrough
+)
 tf.compat.v1.disable_v2_behavior()
 
 
@@ -107,7 +108,7 @@ def main():
     if args.model_fp is None:
         models = [
             tf.keras.models.load_model(f"{args.model_dir}/fold_{i}.h5", compile=False)
-            for i in range(1, 10)
+            for i in tqdm.tqdm(range(1, 10), desc="Loading models")
         ]
     else:
         models = [tf.keras.models.load_model(args.model_fp, compile=False)]
@@ -125,7 +126,9 @@ def main():
         ]
     explainers = [
         shap.DeepExplainer((model.input, contrib), onehot_reference)
-        for (model, contrib) in zip(models, contrib)
+        for (model, contrib) in tqdm.tqdm(
+            zip(models, contrib), desc="Creating explainers"
+        )
     ]
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +136,10 @@ def main():
     raw_explanations = {i: [] for i in range(len(explainers))}
     batch_size = 256
     for i in range(len(explainers)):
-        for j in range(0, len(seqs_to_explain), batch_size):
+        for j in tqdm.tqdm(
+            range(0, len(seqs_to_explain), batch_size),
+            desc=f"Calculating explanations for model fold {i + 1}",
+        ):
             shap_values = explainers[i].shap_values(seqs_to_explain[j : j + batch_size])
             raw_explanations[i].append(shap_values)
             gc.collect()

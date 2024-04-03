@@ -6,6 +6,7 @@ import argparse
 
 import numpy as np
 import pyfastx
+import tqdm
 from scipy.spatial.distance import cdist
 
 import clipnet
@@ -76,14 +77,14 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_onehot = np.array([utils.OneHotDNA(seq).onehot for seq in sequences])
+    seqs_onehot = utils.get_onehot_fasta_sequences(args.fasta_fp)
 
     # Calculate ISM shuffle scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     wt_pred = ensemble.predict(seqs_onehot)
     corr_scores = []
     log_quantity_scores = []
-    for i in range(len(sequences)):
+    for i in tqdm.tqdm(range(len(sequences)), desc="Calculating ISM shuffle scores"):
         corr_score = []
         log_quantity_score = []
         rec = sequences[i]

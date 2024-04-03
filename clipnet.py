@@ -12,8 +12,8 @@ from pathlib import Path
 import GPUtil
 import numpy as np
 import tensorflow as tf
+import tqdm
 from tensorflow.keras.callbacks import CSVLogger
-from tqdm.keras import TqdmCallback
 
 import cgen
 import time_history
@@ -203,7 +203,7 @@ class CLIPNET:
                 verbose=1, patience=self.nn.patience
             )
             training_time = time_history.TimeHistory()
-            tqdm_callback = TqdmCallback(
+            tqdm_callback = tqdm.keras.TqdmCallback(
                 verbose=1, bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
             )
             csv_logger = CSVLogger(
@@ -251,7 +251,7 @@ class CLIPNET:
         model_fps = list(Path(model_dir).glob("fold_*.h5"))
         models = [
             tf.keras.models.load_model(model_fp, compile=False)
-            for model_fp in model_fps
+            for model_fp in tqdm.tqdm(model_fps, desc="Loading models")
         ]
         for i in range(len(models)):
             models[i]._name = f"model_{i}"
@@ -283,12 +283,11 @@ class CLIPNET:
         model = tf.keras.models.load_model(model_fp, compile=False)
         sequence = utils.get_onehot_fasta_sequences(fasta_fp)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
-        print("Computing predictions ...")
         if low_mem:
             batch_size = self.nn.batch_size
             y_predict_handle = [
-                model(X[i : i + batch_size, :, :], training=False)
-                for i in range(0, X.shape[0], batch_size)
+                model(X[i : i + batch_size, :, :], training=False, verbose=0)
+                for i in tqdm.tqdm(range(0, X.shape[0], batch_size))
             ]
             y_predict = [
                 np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
@@ -296,7 +295,6 @@ class CLIPNET:
             ]
         else:
             y_predict = model.predict(X)
-        print("Done predicting")
         return y_predict
 
     def predict_ensemble(
@@ -313,12 +311,11 @@ class CLIPNET:
         ensemble = self.construct_ensemble(model_dir)
         sequence = utils.get_onehot_fasta_sequences(fasta_fp)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
-        print("Computing predictions ...")
         if low_mem:
             batch_size = self.nn.batch_size
             y_predict_handle = [
-                ensemble(X[i : i + batch_size, :, :], training=False)
-                for i in range(0, X.shape[0], batch_size)
+                ensemble(X[i : i + batch_size, :, :], training=False, verbose=0)
+                for i in tqdm.tqdm(range(0, X.shape[0], batch_size), desc="Predicting")
             ]
             y_predict = [
                 np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
@@ -326,7 +323,6 @@ class CLIPNET:
             ]
         else:
             y_predict = ensemble.predict(X)
-        print("Done predicting")
         return y_predict
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
