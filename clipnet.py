@@ -276,7 +276,7 @@ class CLIPNET:
         model_fp,
         fasta_fp,
         reverse_complement=False,
-        low_mem=False,
+        low_mem=True,
         desc="Predicting",
     ):
         """
