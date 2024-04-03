@@ -146,7 +146,7 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
         import multiprocessing as mp
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
-        onehot_encoded = tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs))
+        onehot_encoded = list(tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs)))
     else:
         onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs)]
     return np.array(onehot_encoded)
