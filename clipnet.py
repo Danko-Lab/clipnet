@@ -286,7 +286,7 @@ class CLIPNET:
             model = tf.keras.models.load_model(model_fp, compile=False)
         sequence = utils.get_onehot_fasta_sequences(fasta_fp)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
-        if low_mem:
+        if low_mem and self.nn.batch_size < X.shape[0]:
             batch_size = self.nn.batch_size
             y_predict_handle = [
                 model(X[i : i + batch_size, :, :], training=False, verbose=0)
