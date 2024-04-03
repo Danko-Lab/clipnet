@@ -11,6 +11,7 @@ logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import argparse
 import gc
 
+import GPUtil
 import numpy as np
 import pyfastx
 import shap
@@ -107,9 +108,16 @@ def main():
         gpus = tf.config.experimental.list_physical_devices("GPU")
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
-        tf.config.set_visible_devices(gpus[args.use_specific_gpu], "GPU")
-    else:
-        tf.config.set_visible_devices([], "GPU")
+        gpus = tf.config.list_physical_devices("GPU")
+        if args.use_specific_gpu is not None:
+            assert args.use_specific_gpu < len(
+                gpus
+            ), f"Requested GPU index {args.use_specific_gpu} does not exist."
+            gpu = gpus[args.use_specific_gpu]
+        else:
+            gpu = gpus[GPUtil.getAvailable()[0]]
+        print(f"Requested 1 GPU. Using GPU {gpu}.")
+        tf.config.set_visible_devices(gpu, "GPU")
 
     if args.model_fp is None:
         models = [
