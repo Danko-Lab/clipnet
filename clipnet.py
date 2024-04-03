@@ -270,7 +270,12 @@ class CLIPNET:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def predict_on_fasta(
-        self, model_fp, fasta_fp, reverse_complement=False, low_mem=False, verbose=2
+        self,
+        model_fp,
+        fasta_fp,
+        reverse_complement=False,
+        low_mem=True,
+        desc="Predicting",
     ):
         """
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
@@ -282,18 +287,18 @@ class CLIPNET:
             model = tf.keras.models.load_model(model_fp, compile=False)
         sequence = utils.get_onehot_fasta_sequences(fasta_fp)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
-        # if low_mem:
-        #    batch_size = self.nn.batch_size
-        #    y_predict_handle = [
-        #        model(X[i : i + batch_size, :, :], training=False, verbose=0)
-        #        for i in range(0, X.shape[0], batch_size)
-        #    ]
-        #    y_predict = [
-        #        np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
-        #        np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
-        #    ]
-        # else:
-        y_predict = model.predict(X, batch_size=256, verbose=verbose)
+        if low_mem:
+            batch_size = self.nn.batch_size
+            y_predict_handle = [
+                model(X[i : i + batch_size, :, :], training=False, verbose=0)
+                for i in tqdm.tqdm(range(0, X.shape[0], batch_size), desc=desc)
+            ]
+            y_predict = [
+                np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
+                np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
+            ]
+        else:
+            y_predict = model.predict(X, batch_size=256, verbose=verbose)
         return y_predict
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
