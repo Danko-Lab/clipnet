@@ -270,11 +270,7 @@ class CLIPNET:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def predict_on_fasta(
-        self,
-        model_fp,
-        fasta_fp,
-        reverse_complement=False,
-        low_mem=False,
+        self, model_fp, fasta_fp, reverse_complement=False, low_mem=False, verbose=2
     ):
         """
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
@@ -297,7 +293,7 @@ class CLIPNET:
         #        np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
         #    ]
         # else:
-        y_predict = model.predict(X)
+        y_predict = model.predict(X, batch_size=256, verbose=verbose)
         return y_predict
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

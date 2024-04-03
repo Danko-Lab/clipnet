@@ -100,7 +100,9 @@ def main():
                 )
                 mutated_seqs.append(mutated_seq)
             mut_pred = ensemble.predict(
-                np.array([utils.OneHotDNA(seq).onehot for seq in mutated_seqs])
+                np.array([utils.OneHotDNA(seq).onehot for seq in mutated_seqs]),
+                batch_size=256,
+                verbose=0,
             )
             mut_corr = (
                 1
