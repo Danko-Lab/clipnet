@@ -304,7 +304,7 @@ class CLIPNET:
                 np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
             ]
         else:
-            y_predict = model.predict(X, batch_size=self.nn.batch_size, verbose=2)
+            y_predict = model.predict(X, batch_size=self.nn.batch_size, verbose=1)
         return y_predict
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
