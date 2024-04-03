@@ -133,7 +133,7 @@ def get_bedtool_from_list(bt, list_of_ints):
     return [bt[i] for i in list_of_ints]
 
 
-def get_onehot_fasta_sequences(fasta_fp, cores=16):
+def get_onehot_fasta_sequences(fasta_fp, cores=16, desc="One-hot encoding"):
     """
     Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
     array of all sequences.
@@ -146,9 +146,11 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
         import multiprocessing as mp
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
-        onehot_encoded = list(tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs)))
+        onehot_encoded = list(
+            tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs), desc=desc)
+        )
     else:
-        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs)]
+        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs, desc=desc)]
     return np.array(onehot_encoded)
 
 
