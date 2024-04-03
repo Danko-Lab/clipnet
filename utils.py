@@ -5,10 +5,10 @@ Important helper functions for clipnet_generator.
 import gzip
 import os
 import re
-import tqdm
 
 import numpy as np
 import pyfastx
+import tqdm
 
 
 class OneHotDNA:
@@ -144,10 +144,9 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16):
         import multiprocessing as mp
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
-        parallelized = pool.imap(get_onehot, seqs)
-        onehot_encoded = []
+        onehot_encoded = tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs))
     else:
-        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm(seqs)]
+        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs)]
     return np.array(onehot_encoded)
 
 
