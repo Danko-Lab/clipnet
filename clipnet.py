@@ -9,7 +9,7 @@ import math
 import os
 from pathlib import Path
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # or any {'0', '1', '2'}
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # or any {'0', '1', '2'}
 import GPUtil
 import numpy as np
 import tensorflow as tf
