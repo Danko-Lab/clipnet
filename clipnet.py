@@ -3,7 +3,6 @@ This file contains the CLIPNET class, which contains most of the main functions 
 it, predict, and interpret the convolutional neural networks used in the CLIPNET project.
 """
 
-import gc
 import importlib
 import json
 import math
@@ -289,17 +288,21 @@ class CLIPNET:
             model = self.construct_ensemble(model_fp)
         else:
             model = tf.keras.models.load_model(model_fp, compile=False)
-        if low_mem:
+        if low_mem and self.nn.batch_size < X.shape[0]:
+            # tensorflow has a memory leak issue in 2.?. We can fix this by using
+            # model.__call__() on batches rather than the default predict.
             batch_size = self.nn.batch_size
             y_predict_handle = [
                 model(X[i : i + batch_size, :, :], training=False)
-                for i in tqdm.tqdm(range(0, X.shape[0], batch_size), desc=desc)
+                for i in tqdm.tqdm(
+                    range(0, X.shape[0], batch_size),
+                    desc=f"Predicting in batches of {self.nn.batch_size}",
+                )
             ]
             y_predict = [
                 np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
                 np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
             ]
-            gc.collect()
         else:
             y_predict = model.predict(X, batch_size=256, verbose=2)
         return y_predict
