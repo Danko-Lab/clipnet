@@ -293,7 +293,7 @@ class CLIPNET:
             # model.__call__() on batches rather than the default predict.
             batch_size = self.nn.batch_size
             y_predict_handle = [
-                model(X[i : i + batch_size, :, :], training=False)
+                model.predict(X[i : i + batch_size, :, :], verbose=0)
                 for i in tqdm.tqdm(
                     range(0, X.shape[0], batch_size),
                     desc=f"Predicting in batches of {self.nn.batch_size}",
