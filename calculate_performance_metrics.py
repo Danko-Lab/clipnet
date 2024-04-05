@@ -51,7 +51,6 @@ def main():
     ) % 4 == 0, "Padding around predicted tracks must be divisible by 4."
     start = (observed.shape[1] - track.shape[1]) // 4
     end = observed.shape[1] // 2 - start
-    print(start, end)
     observed_clipped = observed[
         :,
         np.r_[start:end, observed.shape[1] // 2 + start : observed.shape[1] // 2 + end],
@@ -59,8 +58,10 @@ def main():
 
     track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
     track_js_distance = jensenshannon(track, observed_clipped, axis=1)
-    quantity_log_pearson = pearsonr(np.log1p(quantity), np.log1p(observed.sum(axis=1)))
-    quantity_spearman = spearmanr(quantity, observed.sum(axis=1))
+    quantity_log_pearson = pearsonr(
+        np.log1p(quantity), np.log1p(observed_clipped.sum(axis=1))
+    )
+    quantity_spearman = spearmanr(quantity, observed_clipped.sum(axis=1))
 
     print(f"Median Track Pearson: {track_pearson.median():.4f}")
     print(f"Median Track JS Distance: {np.median(track_js_distance):.4f}")
