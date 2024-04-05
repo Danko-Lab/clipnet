@@ -81,3 +81,7 @@ def main():
         hf.create_dataset(
             "quantity_spearman", data=quantity_spearman[0], compression="gzip"
         )
+
+
+if __name__ == "__main__":
+    main()
