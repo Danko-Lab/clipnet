@@ -59,7 +59,7 @@ def main():
     track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
     track_js_distance = jensenshannon(track, observed_clipped, axis=1)
     track_directionality = np.log1p(
-        track[:, : track.shape[1] / 2].sum(axis=1)
+        track[:, : track.shape[1] // 2].sum(axis=1)
     ) - np.log1p(track[:, track.shape[1] // 2 :].sum(axis=1))
     observed_directionality = np.log1p(
         observed_clipped[:, : observed_clipped.shape[1] // 2].sum(axis=1)
