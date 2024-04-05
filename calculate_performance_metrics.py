@@ -62,7 +62,7 @@ def main():
     quantity_spearman = spearmanr(quantity, observed.sum(axis=1))
 
     print(f"Median Track Pearson: {track_pearson.median():.4f}")
-    print(f"Median Track JS Distance: {track_js_distance.median():.4f}")
+    print(f"Median Track JS Distance: {np.median(track_js_distance):.4f}")
     print(f"Quantity Log Pearson: {quantity_log_pearson[0]:.4f}")
     print(f"Quantity Spearman: {quantity_spearman[0]:.4f}")
 
