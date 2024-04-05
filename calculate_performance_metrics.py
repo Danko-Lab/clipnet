@@ -56,10 +56,8 @@ def main():
         np.r_[start:end, observed.shape[1] // 2 + start : observed.shape[1] // 2 + end],
     ]
 
-    track_pearson = pd.DataFrame(track[0]).corrwith(
-        pd.DataFrame(observed_clipped), axis=1
-    )
-    track_js_distance = jensenshannon(track[0], observed_clipped, axis=1)
+    track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
+    track_js_distance = jensenshannon(track, observed_clipped, axis=1)
     quantity_log_pearson = pearsonr(np.log1p(quantity), np.log1p(observed.sum(axis=1)))
     quantity_spearman = spearmanr(quantity, observed.sum(axis=1))
 
