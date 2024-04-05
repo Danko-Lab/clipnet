@@ -64,7 +64,7 @@ def main():
     observed_directionality = np.log1p(
         observed_clipped[:, : observed_clipped.shape[1] // 2].sum(axis=1)
     ) - np.log1p(observed_clipped[:, observed_clipped.shape[1] // 2 :].sum(axis=1))
-    directionality_pearson = pearsonr(track_directionality, observed_directionality)[0]
+    directionality_pearson = pearsonr(track_directionality, observed_directionality)
     quantity_log_pearson = pearsonr(
         np.log1p(quantity), np.log1p(observed_clipped.sum(axis=1))
     )
@@ -72,7 +72,7 @@ def main():
 
     print(f"Median Track Pearson: {track_pearson.median():.4f}")
     print(f"Median Track JS Distance: {np.median(track_js_distance):.4f}")
-    print(f"Track Directionality Pearson: {directionality_pearson:.4f}")
+    print(f"Track Directionality Pearson: {directionality_pearson[0]:.4f}")
     print(f"Quantity Log Pearson: {quantity_log_pearson[0]:.4f}")
     print(f"Quantity Spearman: {quantity_spearman[0]:.4f}")
 
