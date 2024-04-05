@@ -84,7 +84,9 @@ def main():
             "track_js_distance", data=track_js_distance, compression="gzip"
         )
         hf.create_dataset(
-            "track_directionality", data=track_directionality, compression="gzip"
+            "track_directionality",
+            data=np.array(directionality_pearson),
+            compression="gzip",
         )
         hf.create_dataset(
             "quantity_log_pearson",
