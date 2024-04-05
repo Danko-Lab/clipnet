@@ -74,10 +74,12 @@ def main():
             "track_js_distance", data=track_js_distance, compression="gzip"
         )
         hf.create_dataset(
-            "quantity_log_pearson", data=quantity_log_pearson[0], compression="gzip"
+            "quantity_log_pearson",
+            data=np.array(quantity_log_pearson),
+            compression="gzip",
         )
         hf.create_dataset(
-            "quantity_spearman", data=quantity_spearman[0], compression="gzip"
+            "quantity_spearman", data=np.array(quantity_spearman), compression="gzip"
         )
 
 
