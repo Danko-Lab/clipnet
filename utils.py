@@ -133,13 +133,18 @@ def get_bedtool_from_list(bt, list_of_ints):
     return [bt[i] for i in list_of_ints]
 
 
-def get_onehot_fasta_sequences(fasta_fp, cores=16, desc="One-hot encoding"):
+def get_onehot_fasta_sequences(
+    fasta_fp, cores=16, desc="One-hot encoding", silence=False
+):
     """
     Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
     array of all sequences.
     """
     seqs = [
-        rec.seq for rec in tqdm.tqdm(pyfastx.Fasta(fasta_fp), desc="Reading sequences")
+        rec.seq
+        for rec in tqdm.tqdm(
+            pyfastx.Fasta(fasta_fp), desc="Reading sequences", disable=silence
+        )
     ]
     if cores > 1:
         # Use multiprocessing to parallelize onehot encoding
@@ -147,10 +152,14 @@ def get_onehot_fasta_sequences(fasta_fp, cores=16, desc="One-hot encoding"):
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
         onehot_encoded = list(
-            tqdm.tqdm(pool.imap(get_onehot, seqs), total=len(seqs), desc=desc)
+            tqdm.tqdm(
+                pool.imap(get_onehot, seqs), total=len(seqs), desc=desc, disable=silence
+            )
         )
     else:
-        onehot_encoded = [OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs, desc=desc)]
+        onehot_encoded = [
+            OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs, desc=desc, disable=silence)
+        ]
     return np.array(onehot_encoded)
 
 

@@ -58,7 +58,7 @@ def main():
 
     track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
     track_js_distance = jensenshannon(track, observed_clipped, axis=1)
-    quantity_log_pearson = pearsonr(np.log1p(quantity), np.log1p(observed.sum(axis=1)))
+    quantity_log_pearson = pearsonr(np.log(quantity), np.log(observed.sum(axis=1)))
     quantity_spearman = spearmanr(quantity, observed.sum(axis=1))
 
     print(f"Median Track Pearson: {track_pearson.median():.4f}")

@@ -277,6 +277,7 @@ class CLIPNET:
         reverse_complement=False,
         low_mem=True,
         desc="Predicting",
+        silence=False,
     ):
         """
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
@@ -297,6 +298,7 @@ class CLIPNET:
                 for i in tqdm.tqdm(
                     range(0, X.shape[0], batch_size),
                     desc=f"Predicting in batches of {self.nn.batch_size}",
+                    disable=silence,
                 )
             ]
             y_predict = [
