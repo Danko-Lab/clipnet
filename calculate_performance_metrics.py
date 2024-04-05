@@ -32,7 +32,7 @@ def main():
     )
     args = parser.parse_args()
     with h5py.File(args.predictions, "r") as hf:
-        track, quantity = hf["track"][:], hf["quantity"][:]
+        track, quantity = hf["track"][:], hf["quantity"][:, 0]
 
     if args.observed.endswith(".npz") or args.observed.endswith(".npy"):
         observed = np.load(args.observed)
