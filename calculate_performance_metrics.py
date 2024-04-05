@@ -51,6 +51,7 @@ def main():
     ) % 4 == 0, "Padding around predicted tracks must be divisible by 4."
     start = (observed.shape[1] - track.shape[1]) // 4
     end = observed.shape[1] // 2 - start
+    print(start, end)
     observed_clipped = observed[
         :,
         np.r_[start:end, observed.shape[1] // 2 + start : observed.shape[1] // 2 + end],
