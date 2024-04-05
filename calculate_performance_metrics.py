@@ -58,6 +58,13 @@ def main():
 
     track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
     track_js_distance = jensenshannon(track, observed_clipped, axis=1)
+    track_directionality = np.log1p(
+        track[:, : track.shape[1] / 2].sum(axis=1)
+    ) - np.log1p(track[:, track.shape[1] / 2 :].sum(axis=1))
+    observed_directionality = np.log1p(
+        observed_clipped[:, : observed_clipped.shape[1] / 2].sum(axis=1)
+    ) - np.log1p(observed_clipped[:, observed_clipped.shape[1] / 2 :].sum(axis=1))
+    directionality_pearson = pearsonr(track_directionality, observed_directionality)[0]
     quantity_log_pearson = pearsonr(
         np.log1p(quantity), np.log1p(observed_clipped.sum(axis=1))
     )
@@ -65,6 +72,7 @@ def main():
 
     print(f"Median Track Pearson: {track_pearson.median():.4f}")
     print(f"Median Track JS Distance: {np.median(track_js_distance):.4f}")
+    print(f"Track Directionality Pearson: {directionality_pearson:.4f}")
     print(f"Quantity Log Pearson: {quantity_log_pearson[0]:.4f}")
     print(f"Quantity Spearman: {quantity_spearman[0]:.4f}")
 
@@ -74,6 +82,9 @@ def main():
         )
         hf.create_dataset(
             "track_js_distance", data=track_js_distance, compression="gzip"
+        )
+        hf.create_dataset(
+            "track_directionality", data=track_directionality, compression="gzip"
         )
         hf.create_dataset(
             "quantity_log_pearson",
