@@ -55,7 +55,6 @@ class RevOneHotDNA:
         self.onehot = onehot
         self.name = name
         self.id = name
-
         # reverse one hot the sequence
         encoding = {
             "A": np.array([2, 0, 0, 0]),
@@ -71,7 +70,6 @@ class RevOneHotDNA:
             "K": np.array([0, 0, 1, 1]),
         }
         reverse_encoding = {encoding[k].tobytes(): k for k in encoding.keys()}
-
         seq = [reverse_encoding[np.array(pos).tobytes()] for pos in onehot.tolist()]
         self.seq = "".join(seq)
 
