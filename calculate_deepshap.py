@@ -128,6 +128,7 @@ def main():
         models = [tf.keras.models.load_model(args.model_fp, compile=False)]
     if args.mode == "quantity":
         contrib = [model.output[1] for model in models]
+        check_additivity = True
     else:
         contrib = [
             tf.reduce_mean(
@@ -138,6 +139,7 @@ def main():
             )
             for model in models
         ]
+        check_additivity = False
     explainers = [
         shap.DeepExplainer((model.input, contrib), onehot_reference)
         for (model, contrib) in tqdm.tqdm(
@@ -155,7 +157,7 @@ def main():
             desc += f" for model fold {i + 1}"
         for j in tqdm.tqdm(range(0, len(seqs_to_explain), batch_size), desc=desc):
             shap_values = explainer.shap_values(
-                seqs_to_explain[j : j + batch_size], check_additivity=False
+                seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
             raw_explanations[i].append(shap_values)
             gc.collect()
