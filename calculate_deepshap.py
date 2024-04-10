@@ -154,7 +154,9 @@ def main():
         if len(explainers) == 1:
             desc += f" for model fold {i + 1}"
         for j in tqdm.tqdm(range(0, len(seqs_to_explain), batch_size), desc=desc):
-            shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])
+            shap_values = explainer.shap_values(
+                seqs_to_explain[j : j + batch_size], check_additivity=False
+            )
             raw_explanations[i].append(shap_values)
             gc.collect()
 
