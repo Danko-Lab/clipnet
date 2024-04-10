@@ -150,9 +150,9 @@ def main():
     raw_explanations = {i: [] for i in range(len(explainers))}
     batch_size = 256
     for i, explainer in enumerate(explainers):
-        desc = "Calculating explanations for model"
+        desc = "Calculating explanations"
         if len(explainers) == 1:
-            desc += f" fold {i + 1}"
+            desc += f" for model fold {i + 1}"
         for j in tqdm.tqdm(range(0, len(seqs_to_explain), batch_size), desc=desc):
             shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])
             raw_explanations[i].append(shap_values)
