@@ -149,12 +149,12 @@ def main():
 
     raw_explanations = {i: [] for i in range(len(explainers))}
     batch_size = 256
-    for i in range(len(explainers)):
-        for j in tqdm.tqdm(
-            range(0, len(seqs_to_explain), batch_size),
-            desc=f"Calculating explanations for model fold {i + 1}",
-        ):
-            shap_values = explainers[i].shap_values(seqs_to_explain[j : j + batch_size])
+    for i, explainer in enumerate(explainers):
+        desc = "Calculating explanations for model"
+        if len(explainers) == 1:
+            desc += f" fold {i + 1}"
+        for j in tqdm.tqdm(range(0, len(seqs_to_explain), batch_size), desc=desc):
+            shap_values = explainer.shap_values(seqs_to_explain[j : j + batch_size])
             raw_explanations[i].append(shap_values)
             gc.collect()
 
@@ -164,7 +164,7 @@ def main():
             np.concatenate([exp for exp in raw_explanations[k]], axis=1).sum(axis=0)
         )
 
-    if len(concat_explanations) > 1:
+    if len(explainers) > 1:
         mean_explanations = np.array(concat_explanations).mean(axis=0)
     else:
         mean_explanations = concat_explanations[0]
