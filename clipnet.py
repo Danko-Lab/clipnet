@@ -243,7 +243,7 @@ class CLIPNET:
     # Construct model ensemble.
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def construct_ensemble(self, model_dir="./ensemble_models"):
+    def construct_ensemble(self, model_dir="./ensemble_models", silence=False):
         """
         Constructs an ensemble of models. Model ensembling is done by averaging the
         tracks and quantities of each model in the ensemble.
@@ -252,7 +252,7 @@ class CLIPNET:
         model_fps = list(Path(model_dir).glob("fold_*.h5"))
         models = [
             tf.keras.models.load_model(model_fp, compile=False)
-            for model_fp in tqdm.tqdm(model_fps, desc="Loading models")
+            for model_fp in tqdm.tqdm(model_fps, desc="Loading models", disable=silence)
         ]
         for i in range(len(models)):
             models[i]._name = f"model_{i}"
@@ -283,10 +283,10 @@ class CLIPNET:
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
         Returns [tracks, quantities].
         """
-        sequence = utils.get_onehot_fasta_sequences(fasta_fp)
+        sequence = utils.get_onehot_fasta_sequences(fasta_fp, silence=silence)
         X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
         if os.path.isdir(model_fp):
-            model = self.construct_ensemble(model_fp)
+            model = self.construct_ensemble(model_fp, silence=silence)
         else:
             model = tf.keras.models.load_model(model_fp, compile=False)
         if low_mem and self.nn.batch_size < X.shape[0]:

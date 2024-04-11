@@ -28,6 +28,11 @@ def main():
         default=0,
         help="Index of GPU to use (starting from 0). Does nothing if --gpu is not set.",
     )
+    parser.add_argument(
+        "--silence",
+        action="store_true",
+        help="disables progress bars and other non-essential print statements.",
+    )
     args = parser.parse_args()
 
     nn = (
@@ -41,6 +46,7 @@ def main():
         fasta_fp=args.fasta_fp,
         reverse_complement=args.reverse_complement,
         low_mem=True,
+        silence=args.silence,
     )
     with h5py.File(args.output_fp, "w") as hf:
         hf.create_dataset("track", data=prediction[0], compression="gzip")
