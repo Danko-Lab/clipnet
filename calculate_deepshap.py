@@ -71,6 +71,11 @@ def main():
         default=617,
         help="Random seed for selecting background sequences.",
     )
+    parser.add_argument(
+        "--silence",
+        action="store_true",
+        help="Disables progress bars and other non-essential print statements.",
+    )
     args = parser.parse_args()
     np.random.seed(args.seed)
 
@@ -82,7 +87,9 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_to_explain = utils.get_onehot_fasta_sequences(args.fasta_fp)
+    seqs_to_explain = utils.get_onehot_fasta_sequences(
+        args.fasta_fp, silence=args.silence
+    )
 
     # Perform dinucleotide shuffle on n_subset random sequences
     if len(sequences) < args.n_subset:
@@ -122,7 +129,9 @@ def main():
     if args.model_fp is None:
         models = [
             tf.keras.models.load_model(f"{args.model_dir}/fold_{i}.h5", compile=False)
-            for i in tqdm.tqdm(range(1, 10), desc="Loading models")
+            for i in tqdm.tqdm(
+                range(1, 10), desc="Loading models", disable=args.silence
+            )
         ]
     else:
         models = [tf.keras.models.load_model(args.model_fp, compile=False)]
@@ -143,7 +152,7 @@ def main():
     explainers = [
         shap.DeepExplainer((model.input, contrib), onehot_reference)
         for (model, contrib) in tqdm.tqdm(
-            zip(models, contrib), desc="Creating explainers"
+            zip(models, contrib), desc="Creating explainers", disable=args.silence
         )
     ]
 
@@ -155,7 +164,9 @@ def main():
         desc = "Calculating explanations"
         if len(explainers) == 1:
             desc += f" for model fold {i + 1}"
-        for j in tqdm.tqdm(range(0, len(seqs_to_explain), batch_size), desc=desc):
+        for j in tqdm.tqdm(
+            range(0, len(seqs_to_explain), batch_size), desc=desc, disable=args.silence
+        ):
             shap_values = explainer.shap_values(
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )

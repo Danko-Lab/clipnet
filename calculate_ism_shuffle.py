@@ -62,6 +62,11 @@ def main():
         default=617,
         help="Random seed for generating mutations.",
     )
+    parser.add_argument(
+        "--silence",
+        action="store_true",
+        help="Disables progress bars and other non-essential print statements.",
+    )
     args = parser.parse_args()
     np.random.seed(args.seed)
 
@@ -72,19 +77,23 @@ def main():
         if args.gpu
         else clipnet.CLIPNET(n_gpus=0)
     )
-    ensemble = nn.construct_ensemble(args.model_dir)
+    ensemble = nn.construct_ensemble(args.model_dir, silence=args.silence)
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_onehot = utils.get_onehot_fasta_sequences(args.fasta_fp)
+    seqs_onehot = utils.get_onehot_fasta_sequences(args.fasta_fp, silence=args.silence)
 
     # Calculate ISM shuffle scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     wt_pred = ensemble.predict(seqs_onehot, batch_size=256, verbose=0)
     corr_scores = []
     log_quantity_scores = []
-    for i in tqdm.tqdm(range(len(sequences)), desc="Calculating ISM shuffle scores"):
+    for i in tqdm.tqdm(
+        range(len(sequences)),
+        desc="Calculating ISM shuffle scores",
+        disable=args.silence,
+    ):
         corr_score = []
         log_quantity_score = []
         rec = sequences[i]
