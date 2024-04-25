@@ -152,7 +152,10 @@ def main():
     explainers = [
         shap.DeepExplainer((model.input, contrib), onehot_reference)
         for (model, contrib) in tqdm.tqdm(
-            zip(models, contrib), desc="Creating explainers", disable=args.silence
+            zip(models, contrib),
+            desc="Creating explainers",
+            total=len(models),
+            disable=args.silence,
         )
     ]
 
