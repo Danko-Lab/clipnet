@@ -5,10 +5,23 @@ Important helper functions for clipnet_generator.
 import gzip
 import os
 import re
+import time
 
 import numpy as np
 import pyfastx
+import tensorflow as tf
 import tqdm
+
+
+class TimeHistory(tf.keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.times = []
+
+    def on_epoch_begin(self, batch, logs={}):
+        self.epoch_time_start = time.time()
+
+    def on_epoch_end(self, batch, logs={}):
+        self.times.append(time.time() - self.epoch_time_start)
 
 
 class OneHotDNA:

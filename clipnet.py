@@ -9,16 +9,16 @@ import math
 import os
 from pathlib import Path
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import GPUtil
 import numpy as np
-import tensorflow as tf
 import tqdm
-from tensorflow.keras.callbacks import CSVLogger
 
 import cgen
-import time_history
 import utils
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+import tensorflow as tf
+from tensorflow.keras.callbacks import CSVLogger
 
 
 class CLIPNET:
@@ -203,7 +203,7 @@ class CLIPNET:
             early_stopping = tf.keras.callbacks.EarlyStopping(
                 verbose=1, patience=self.nn.patience
             )
-            training_time = time_history.TimeHistory()
+            training_time = utils.TimeHistory()
             tqdm_callback = tqdm.keras.TqdmCallback(
                 verbose=1, bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
             )
