@@ -82,11 +82,11 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_onehot = utils.get_onehot_fasta_sequences(args.fasta_fp, silence=args.silence)
+    seqs_twohot = utils.get_twohot_fasta_sequences(args.fasta_fp, silence=args.silence)
 
     # Calculate ISM shuffle scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    wt_pred = ensemble.predict(seqs_onehot, batch_size=256, verbose=0)
+    wt_pred = ensemble.predict(seqs_twohot, batch_size=256, verbose=0)
     corr_scores = []
     log_quantity_scores = []
     for i in tqdm.tqdm(
@@ -109,7 +109,7 @@ def main():
                 )
                 mutated_seqs.append(mutated_seq)
             mut_pred = ensemble.predict(
-                np.array([utils.OneHotDNA(seq).onehot for seq in mutated_seqs]),
+                np.array([utils.TwoHotDNA(seq).twohot for seq in mutated_seqs]),
                 batch_size=256,
                 verbose=0,
             )

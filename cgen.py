@@ -44,13 +44,13 @@ def load_data(seq_fp, procap_fp, pad=0, reverse_complement=False):
             print("seq_fp, dnase_fp, procap_fp must be strings or singleton iterables.")
     # load data and check dimensions
     print(f"Loading sequence data from {seq_fp} and procap data from {procap_fp}")
-    X = utils.get_onehot_fasta_sequences(seq_fp)
+    X = utils.get_twohot_fasta_sequences(seq_fp)
     procap = load_track(procap_fp)
     utils.check_dimensions(X, procap)
     print("Successfully loaded data")
     # do rc_augmentation
     if reverse_complement:
-        X = utils.rc_onehot_het(X)
+        X = utils.rc_twohot_het(X)
         procap = procap[:, ::-1]
         print("Computed reverse complement.")
     # output datasets
@@ -117,7 +117,7 @@ class CGen(tf.keras.utils.Sequence):
 
         # Perform reverse complement augmentation
         if self.rc_augmentation:
-            seq_fold = np.concatenate([seq_fold, utils.rc_onehot_het(seq_fold)])
+            seq_fold = np.concatenate([seq_fold, utils.rc_twohot_het(seq_fold)])
             procap_fold = np.concatenate([procap_fold, procap_fold[:, ::-1]])
 
         # Split list of ids into batches

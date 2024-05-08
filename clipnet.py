@@ -283,8 +283,8 @@ class CLIPNET:
         Predicts on a fasta file, where each record is a 1000 5'-3' sequence.
         Returns [tracks, quantities].
         """
-        sequence = utils.get_onehot_fasta_sequences(fasta_fp, silence=silence)
-        X = utils.rc_onehot_het(sequence) if reverse_complement else sequence
+        sequence = utils.get_twohot_fasta_sequences(fasta_fp, silence=silence)
+        X = utils.rc_twohot_het(sequence) if reverse_complement else sequence
         if os.path.isdir(model_fp):
             model = self.construct_ensemble(model_fp, silence=silence)
         else:
@@ -335,8 +335,8 @@ class CLIPNET:
 
         tss = np.zeros((window, 4))
         # get sequences
-        fwd_seq = utils.get_onehot_fasta_sequences(fasta_fp)
-        rev_seq = utils.rc_onehot_het(fwd_seq)
+        fwd_seq = utils.get_twohot_fasta_sequences(fasta_fp)
+        rev_seq = utils.rc_twohot_het(fwd_seq)
         seq = np.concatenate((fwd_seq, rev_seq))
         # compute predicted profile
         fwd_profile = self.predict_ensemble(
@@ -370,7 +370,7 @@ class CLIPNET:
         import joblib
 
         predicted_tss_pos = joblib.load(predicted_tss_fp)
-        seq = utils.get_onehot_fasta_sequences(fasta_fp)
+        seq = utils.get_twohot_fasta_sequences(fasta_fp)
 
         with tf.device("/cpu:0"):
             model = tf.keras.models.load_model(model_fp, compile=False)
@@ -401,7 +401,7 @@ class CLIPNET:
         """
         Computes activation maps for a given convolutional layer.
         """
-        seq = utils.get_onehot_fasta_sequences(fasta_fp)
+        seq = utils.get_twohot_fasta_sequences(fasta_fp)
         with tf.device("/cpu:0"):
             model = tf.keras.models.load_model(model_fp, compile=False)
             conv_layer_outputs = tf.keras.models.Model(

@@ -87,7 +87,7 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_to_explain = utils.get_onehot_fasta_sequences(
+    seqs_to_explain = utils.get_twohot_fasta_sequences(
         args.fasta_fp, silence=args.silence
     )
 
@@ -104,9 +104,9 @@ def main():
         utils.kshuffle(rec.seq, random_seed=args.seed)[0] for rec in reference
     ]
 
-    # One-hot encode shuffled sequences
-    onehot_reference = np.array(
-        [utils.OneHotDNA(seq).onehot for seq in shuffled_reference]
+    # Two-hot encode shuffled sequences
+    twohot_reference = np.array(
+        [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
     )
 
     # Load model and create explainer ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,7 +150,7 @@ def main():
         ]
         check_additivity = False
     explainers = [
-        shap.DeepExplainer((model.input, contrib), onehot_reference)
+        shap.DeepExplainer((model.input, contrib), twohot_reference)
         for (model, contrib) in tqdm.tqdm(
             zip(models, contrib),
             desc="Creating explainers",
@@ -190,7 +190,9 @@ def main():
 
     # Save scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    # Save DeepSHAP scores
     np.savez_compressed(args.score_fp, scaled_explanations.swapaxes(1, 2))
+    # Convert twohot to onehot and save
     np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
 
 

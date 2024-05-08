@@ -24,9 +24,9 @@ class TimeHistory(tf.keras.callbacks.Callback):
         self.times.append(time.time() - self.epoch_time_start)
 
 
-class OneHotDNA:
+class TwoHotDNA:
     """
-    Allows you to access id, seq, and onehot(seq) as attributes. Handles IUPAC ambiguity
+    Allows you to access id, seq, and twohot(seq) as attributes. Handles IUPAC ambiguity
     codes for heterozygotes.
     """
 
@@ -53,19 +53,19 @@ class OneHotDNA:
             "Y": np.array([0, 1, 0, 1]),
             "K": np.array([0, 0, 1, 1]),
         }
-        onehot = [encoding.get(seq, seq) for seq in seq_list]
-        self.onehot = np.array(onehot)
+        twohot = [encoding.get(seq, seq) for seq in seq_list]
+        self.twohot = np.array(twohot)
 
 
-class RevOneHotDNA:
+class RevTwoHotDNA:
     """
-    Reverses an onehot encoding into a string. Handles IUPAC ambiguity codes for
+    Reverses an twohot encoding into a string. Handles IUPAC ambiguity codes for
     heterozygotes. Assumes array is (bp, 4).
     """
 
-    def __init__(self, onehot, name=None):
+    def __init__(self, twohot, name=None):
         # add attributes to self
-        self.onehot = onehot
+        self.twohot = twohot
         self.name = name
         self.id = name
         # reverse one hot the sequence
@@ -83,13 +83,13 @@ class RevOneHotDNA:
             "K": np.array([0, 0, 1, 1]),
         }
         reverse_encoding = {encoding[k].tobytes(): k for k in encoding.keys()}
-        seq = [reverse_encoding[np.array(pos).tobytes()] for pos in onehot.tolist()]
+        seq = [reverse_encoding[np.array(pos).tobytes()] for pos in twohot.tolist()]
         self.seq = "".join(seq)
 
 
-def get_onehot(seq):
-    """Extracts just the onehot encoding from OneHotDNA."""
-    return OneHotDNA(seq).onehot
+def get_twohot(seq):
+    """Extracts just the twohot encoding from TwoHotDNA."""
+    return TwoHotDNA(seq).twohot
 
 
 def gz_read(fp):
@@ -144,11 +144,11 @@ def get_bedtool_from_list(bt, list_of_ints):
     return [bt[i] for i in list_of_ints]
 
 
-def get_onehot_fasta_sequences(
+def get_twohot_fasta_sequences(
     fasta_fp, cores=16, desc="One-hot encoding", silence=False
 ):
     """
-    Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
+    Given a fasta file with each record, returns an twohot-encoded array (n, len, 4)
     array of all sequences.
     """
     seqs = [
@@ -158,32 +158,20 @@ def get_onehot_fasta_sequences(
         )
     ]
     if cores > 1:
-        # Use multiprocessing to parallelize onehot encoding
+        # Use multiprocessing to parallelize twohot encoding
         import multiprocessing as mp
 
         pool = mp.Pool(min(cores, mp.cpu_count()))
-        onehot_encoded = list(
+        twohot_encoded = list(
             tqdm.tqdm(
-                pool.imap(get_onehot, seqs), total=len(seqs), desc=desc, disable=silence
+                pool.imap(get_twohot, seqs), total=len(seqs), desc=desc, disable=silence
             )
         )
     else:
-        onehot_encoded = [
-            OneHotDNA(seq).onehot for seq in tqdm.tqdm(seqs, desc=desc, disable=silence)
+        twohot_encoded = [
+            TwoHotDNA(seq).twohot for seq in tqdm.tqdm(seqs, desc=desc, disable=silence)
         ]
-    return np.array(onehot_encoded)
-
-
-def twohot_fasta(fasta_fp, cores=16):
-    """
-    Given a fasta file with each record, returns an onehot-encoded array (n, len, 4)
-    array of all sequences.
-
-    ### NOTE: THIS IS A RENAME OF get_onehot_fasta_sequences(). I originally called
-    ### our encoding onehot, but it's too late to start renaming everything now. :(
-    ### This function is used to make the API less of a mess.
-    """
-    return get_onehot_fasta_sequences(fasta_fp, cores=cores)
+    return np.array(twohot_encoded)
 
 
 def get_consensus_region(bed_intervals, consensus_fp):
@@ -199,19 +187,19 @@ def get_consensus_region(bed_intervals, consensus_fp):
     return sequences
 
 
-def get_consensus_onehot(bed_intervals, consensus_fp):
+def get_consensus_twohot(bed_intervals, consensus_fp):
     """
     Given a list of bed intervals and a consensus.fna file path, return a list of
-    onehot encodings.
+    twohot encodings.
     """
     sequences = get_consensus_region(bed_intervals, consensus_fp)
-    onehot_list = [OneHotDNA(sequence).onehot for sequence in sequences]
-    return onehot_list
+    twohot_list = [TwoHotDNA(sequence).twohot for sequence in sequences]
+    return twohot_list
 
 
-def rc_onehot_het(arr):
+def rc_twohot_het(arr):
     """
-    Computes reverse-complement onehot. Handles heterozygotes encoded via IUPAC
+    Computes reverse-complement twohot. Handles heterozygotes encoded via IUPAC
     ambiguity codes.
     """
     # inverting each sequence in arr_rc along both axes takes the reverse complement.
