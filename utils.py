@@ -145,7 +145,7 @@ def get_bedtool_from_list(bt, list_of_ints):
 
 
 def get_twohot_fasta_sequences(
-    fasta_fp, cores=16, desc="One-hot encoding", silence=False
+    fasta_fp, cores=16, desc="Twohot encoding", silence=False
 ):
     """
     Given a fasta file with each record, returns an twohot-encoded array (n, len, 4)
