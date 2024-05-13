@@ -99,18 +99,10 @@ class CLIPNET:
             self.model_dir, f"{self.prefix}_architecture.json"
         )
         if resume_checkpoint is not None:
-            self.model_filepath = os.path.join(
-                self.model_dir,
-                f"{self.prefix}_epoch{{epoch:02d}}-loss{{val_loss:.4f}}_resume.hdf5",
-            )
+            self.model_filepath = os.path.join(self.model_dir, "clipnet_resume.hdf5")
         else:
-            self.model_filepath = os.path.join(
-                self.model_dir,
-                f"{self.prefix}_epoch{{epoch:02d}}-loss{{val_loss:.4f}}.hdf5",
-            )
-        self.history_filepath = os.path.join(
-            self.model_dir, f"{self.prefix}_history.json"
-        )
+            self.model_filepath = os.path.join(self.model_dir, "clipnet.hdf5")
+        self.history_filepath = os.path.join(self.model_dir, "clipnet_history.json")
 
     def __adjust_by_n_gpus(self):
         """This function adjusts parameters by the number of GPUs used in training."""
@@ -138,13 +130,11 @@ class CLIPNET:
     def fit(
         self,
         model_dir,
-        dataset_params_fp="dataset_params.json",
         resume_checkpoint=None,
     ):
         """Fits a model based on specified arguments."""
         self.model_dir = model_dir
-        self.dataset_params_fp = dataset_params_fp
-        with open(os.path.join(model_dir, dataset_params_fp), "r") as handle:
+        with open(os.path.join(model_dir, "dataset_params.json"), "r") as handle:
             self.dataset_params = json.load(handle)
         self.__set_model_locations(resume_checkpoint)
         with self.strategy.scope():
