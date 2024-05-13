@@ -2,23 +2,22 @@
 Calculate contribution scores using shap.DeepExplainer.
 """
 
-import logging
-import os
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
-logging.getLogger("tensorflow").setLevel(logging.FATAL)
-
 import argparse
 import gc
+import logging
+import os
 
 import GPUtil
 import numpy as np
 import pyfastx
 import shap
-import tensorflow as tf
 import tqdm
 
 import utils
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
+logging.getLogger("tensorflow").setLevel(logging.FATAL)
+import tensorflow as tf
 
 # This will fix an error message for running tf.__version__==2.5
 shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
