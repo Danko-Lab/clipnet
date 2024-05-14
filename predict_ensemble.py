@@ -5,11 +5,13 @@ This script predicts on a set of data using a fitted model from clipnet.py.
 """
 
 import argparse
+import logging
 import os
 
 import h5py
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
+logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import clipnet
 
 

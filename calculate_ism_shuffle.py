@@ -3,14 +3,19 @@ Calculate ISM shuffle scores.
 """
 
 import argparse
+import logging
+import os
 
 import numpy as np
 import pyfastx
 import tqdm
 from scipy.spatial.distance import cdist
 
-import clipnet
 import utils
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
+logging.getLogger("tensorflow").setLevel(logging.FATAL)
+import clipnet
 
 
 def main():

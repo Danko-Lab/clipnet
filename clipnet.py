@@ -12,7 +12,6 @@ from pathlib import Path
 
 import GPUtil
 import numpy as np
-import tqdm
 
 import cgen
 import utils
@@ -20,7 +19,9 @@ import utils
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import tensorflow as tf
+import tqdm
 from tensorflow.keras.callbacks import CSVLogger
+from tqdm.keras import TqdmCallback
 
 
 class CLIPNET:
@@ -196,7 +197,7 @@ class CLIPNET:
                 verbose=1, patience=self.nn.patience
             )
             training_time = utils.TimeHistory()
-            tqdm_callback = tqdm.keras.TqdmCallback(
+            tqdm_callback = TqdmCallback(
                 verbose=1, bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
             )
             csv_logger = CSVLogger(

@@ -5,11 +5,14 @@ This script calculates TSS position weight matrices from a fit clipnet.py model.
 """
 
 import argparse
+import logging
 import os
 
 import joblib
 import seqlogo
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
+logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import clipnet
 
 
