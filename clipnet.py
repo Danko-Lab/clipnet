@@ -5,6 +5,7 @@ it, predict, and interpret the convolutional neural networks used in the CLIPNET
 
 import importlib
 import json
+import logging
 import math
 import os
 from pathlib import Path
@@ -16,7 +17,8 @@ import tqdm
 import cgen
 import utils
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
+logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import tensorflow as tf
 from tensorflow.keras.callbacks import CSVLogger
 
