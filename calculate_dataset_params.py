@@ -12,7 +12,7 @@ import numpy as np
 
 
 def write_dataset_params(i, datadir, outdir):
-    outdir = f"/home2/ayh8/ensemble_models/f{i + 1}/"
+    outdir = f"{outdir}/f{i + 1}/"
     os.makedirs(outdir, exist_ok=True)
 
     test_folds = [i + 1]
