@@ -8,6 +8,7 @@ import json
 import logging
 import math
 import os
+import time
 from pathlib import Path
 
 import GPUtil
@@ -22,6 +23,17 @@ import tensorflow as tf
 import tqdm
 from tensorflow.keras.callbacks import CSVLogger
 from tqdm.keras import TqdmCallback
+
+
+class TimeHistory(tf.keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.times = []
+
+    def on_epoch_begin(self, batch, logs={}):
+        self.epoch_time_start = time.time()
+
+    def on_epoch_end(self, batch, logs={}):
+        self.times.append(time.time() - self.epoch_time_start)
 
 
 class CLIPNET:
@@ -196,7 +208,7 @@ class CLIPNET:
             early_stopping = tf.keras.callbacks.EarlyStopping(
                 verbose=1, patience=self.nn.patience
             )
-            training_time = utils.TimeHistory()
+            training_time = TimeHistory()
             tqdm_callback = TqdmCallback(
                 verbose=1, bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
             )
