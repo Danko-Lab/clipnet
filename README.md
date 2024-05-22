@@ -31,6 +31,8 @@ do wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -P ensemble_mo
 done
 ```
 
+Alternatively, they can be accessed via [HuggingFace](https://huggingface.co/adamyhe/clipnet).
+
 ## Usage
 
 ### Input data
