@@ -132,16 +132,17 @@ def get_bedtool_from_list(bt, list_of_ints):
 
 
 def get_twohot_fasta_sequences(
-    fasta_fp, cores=16, desc="Twohot encoding", silence=False
+    fasta_fp, cores=8, desc="Twohot encoding", silence=False
 ):
     """
     Given a fasta file with each record, returns an twohot-encoded array (n, len, 4)
     array of all sequences.
     """
+    fa = pyfastx.Fasta(fasta_fp)
     seqs = [
         rec.seq
         for rec in tqdm.tqdm(
-            pyfastx.Fasta(fasta_fp), desc="Reading sequences", disable=silence
+            fa, desc="Reading sequences", disable=silence, total=len(fa)
         )
     ]
     if cores > 1:
