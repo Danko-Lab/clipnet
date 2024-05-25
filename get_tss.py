@@ -18,9 +18,6 @@ import clipnet
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "model_dir", type=str, help="directory where to load models from."
-    )
-    parser.add_argument(
         "fasta_fp",
         type=str,
         default=None,
@@ -32,15 +29,21 @@ def main():
         help="where should the output be written? Will export a joblib.gz file.",
     )
     parser.add_argument(
-        "--use_specific_gpu",
+        "--model_dir",
+        type=str,
+        default="ensemble_models/",
+        help="directory where to load models from.",
+    )
+    parser.add_argument(
+        "--gpu",
         type=int,
         default=None,
         help="Index of GPU to use (starting at 0). If None, will use CPU.",
     )
     args = parser.parse_args()
 
-    if args.use_specific_gpu is not None:
-        nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.use_specific_gpu)
+    if args.gpu is not None:
+        nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
     else:
         nn = clipnet.CLIPNET(n_gpus=0)
     tss = nn.compute_tss(args.model_dir, args.fasta_fp)

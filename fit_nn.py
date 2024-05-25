@@ -34,22 +34,20 @@ def main():
         default=None,
         help="resume training from this model.",
     )
-    parser.add_argument("--n_gpus", type=int, default=1, help="number of gpus to use.")
     parser.add_argument(
-        "--use_specific_gpu",
+        "--gpu",
         type=int,
         default=None,
-        help="If n_gpus==1, allows choice of specific gpu.",
+        help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
     )
     args = parser.parse_args()
-    resume = args.resume_checkpoint
-    model_dir = args.model_dir
-    args_vars = vars(args)
-    del args_vars["resume_checkpoint"]
-    del args_vars["model_dir"]
 
-    nn = clipnet.CLIPNET(**args_vars)
-    nn.fit(model_dir=model_dir, resume_checkpoint=resume)
+    nn = (
+        clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu, prefix=args.prefix)
+        if args.gpu is not None
+        else clipnet.CLIPNET(n_gpus=0, prefix=args.prefix)
+    )
+    nn.fit(model_dir=args.model_dir, resume_checkpoint=args.resume_checkpoint)
 
 
 if __name__ == "__main__":

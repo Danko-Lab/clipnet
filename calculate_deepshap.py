@@ -7,7 +7,6 @@ import gc
 import logging
 import os
 
-import GPUtil
 import numpy as np
 import pyfastx
 import shap
@@ -50,12 +49,11 @@ def main():
         default="quantity",
         help="Calculate contrib scores for quantity or profile.",
     )
-    parser.add_argument("--gpu", action="store_true", help="Enable GPU.")
     parser.add_argument(
-        "--use_specific_gpu",
+        "--gpu",
         type=int,
-        default=0,
-        help="Index of GPU to use (starting from 0). Does nothing if --gpu is not set.",
+        default=None,
+        help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
     )
     parser.add_argument(
         "--n_subset",
@@ -110,19 +108,14 @@ def main():
 
     # Load model and create explainer ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if args.gpu:
+    if args.gpu is not None:
         gpus = tf.config.experimental.list_physical_devices("GPU")
+        assert args.gpu < len(gpus), f"Requested GPU {args.gpu} does not exist."
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         gpus = tf.config.list_physical_devices("GPU")
-        if args.use_specific_gpu is not None:
-            assert args.use_specific_gpu < len(
-                gpus
-            ), f"Requested GPU index {args.use_specific_gpu} does not exist."
-            gpu = gpus[args.use_specific_gpu]
-        else:
-            gpu = gpus[GPUtil.getAvailable()[0]]
-        print(f"Requested 1 GPU. Using GPU {gpu}.")
+        gpu = gpus[args.gpu]
+        print(f"Using GPU {gpu}.")
         tf.config.set_visible_devices(gpu, "GPU")
 
     if args.model_fp is None:

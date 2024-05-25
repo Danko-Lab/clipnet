@@ -35,12 +35,11 @@ def main():
         action="store_true",
         help="Reverse complements the input data.",
     )
-    parser.add_argument("--gpu", action="store_true", help="enable GPU.")
     parser.add_argument(
-        "--use_specific_gpu",
+        "--gpu",
         type=int,
-        default=0,
-        help="Index of GPU to use (starting from 0). Does nothing if --gpu is not set.",
+        default=None,
+        help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
     )
     parser.add_argument(
         "--silence",
@@ -50,8 +49,8 @@ def main():
     args = parser.parse_args()
 
     nn = (
-        clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.use_specific_gpu)
-        if args.gpu
+        clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
+        if args.gpu is not None
         else clipnet.CLIPNET(n_gpus=0)
     )
     ensemble_predictions = nn.predict_on_fasta(
