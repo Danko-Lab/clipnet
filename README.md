@@ -50,8 +50,8 @@ We encode sequences using a "two-hot" encoding. That is, we encoded each individ
 To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_model.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
 
 ```bash
-python predict_ensemble.py data/test.fa data/test_predictions.h5 --gpu
-# Use the --gpu flag to run on GPU
+python predict_ensemble.py data/test.fa data/test_predictions.h5 --gpu 0
+# Use the --gpu flag to select which GPU to run on
 ```
 
 To input individualized sequences, heterozygous positions should be represented using the IUPAC ambiguity codes R (A/G), Y (C/T), S (C/G), W (A/T), K (G/T), M (A/C).
@@ -80,14 +80,14 @@ python calculate_deepshap.py \
     data/test_deepshap_quantity.npz \
     data/test_onehot.npz \
     --mode quantity \
-    --gpu
+    --gpu 0
 
 python calculate_deepshap.py \
     data/test.fa \
     data/test_deepshap_profile.npz \
     data/test_onehot.npz \
     --mode profile \
-    --gpu
+    --gpu 0
 ```
 
 Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. tfmodisco-lite also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000), with the sequence array being one-hot. To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. The outputs of this model can be used as inputs to tfmodisco-lite to generate motif logos and motif tracks.
@@ -99,7 +99,7 @@ Both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a
 To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results ("corr_ism_shuffle" and "log_quantity_ism_shuffle") for each record. For example:
 
 ```bash
-python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu
+python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu 0
 ```
 
 ### API usage
