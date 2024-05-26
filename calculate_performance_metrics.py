@@ -39,7 +39,7 @@ def main():
         if args.observed.endswith(".npz"):
             observed = observed["arr_0"]
     elif args.observed.endswith(".csv.gz") or args.observed.endswith(".csv"):
-        observed = pd.read_csv(args.observed, header=None).to_numpy()
+        observed = pd.read_csv(args.observed, header=None, index_col=0).to_numpy()
     assert (
         track.shape[0] == observed.shape[0]
     ), f"n predictions ({track.shape[0]}) and n observed ({observed.shape[0]}) do not match."
