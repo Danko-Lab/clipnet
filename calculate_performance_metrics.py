@@ -48,7 +48,7 @@ def main():
     ), f"Predicted tracks ({track.shape[1]}) are longer than observed ({observed.shape[1]})."
     assert (
         observed.shape[1] - track.shape[1]
-    ) % 4 == 0, "Padding around predicted tracks must be divisible by 4."
+    ) % 4 == 0, f"Padding around predicted tracks must be divisible by 4. {observed.shape[1] - track.shape[1]}"
     start = (observed.shape[1] - track.shape[1]) // 4
     end = observed.shape[1] // 2 - start
     observed_clipped = observed[
