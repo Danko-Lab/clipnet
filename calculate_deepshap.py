@@ -89,12 +89,12 @@ def main():
     )
 
     # Perform dinucleotide shuffle on n_subset random sequences
-    if len(sequences) < args.n_subset:
-        args.n_subset = len(sequences)
     reference = [
         sequences[i]
         for i in np.random.choice(
-            np.array(range(len(sequences))), size=args.n_subset, replace=False
+            np.array(range(len(sequences))),
+            size=max(args.n_subset, len(sequences)),
+            replace=False,
         )
     ]
     shuffled_reference = [
