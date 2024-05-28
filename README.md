@@ -64,7 +64,7 @@ We note that the track node was not optimized for quantity prediction. As a resu
 import h5py
 import numpy as np
 
-with h5py.File("data/test.h5", "r") as f:
+with h5py.File("data/test_predictions.h5", "r") as f:
     profile = f["track"][:]
     quantity = f["quantity"][:]
     profile_scaled = (profile / np.sum(profile, axis=1)[:, None]) * quantity
