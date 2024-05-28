@@ -175,7 +175,7 @@ def main():
         )
 
     if len(explainers) > 1:
-        mean_explanations = np.array(concat_explanations).mean(axis=-1)
+        mean_explanations = np.array(concat_explanations).mean(axis=0)
     else:
         mean_explanations = concat_explanations[0]
     scaled_explanations = mean_explanations * seqs_to_explain
