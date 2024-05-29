@@ -89,6 +89,12 @@ def main():
     )
 
     # Perform dinucleotide shuffle on n_subset random sequences
+    if args.n_subset > len(sequences):
+        print(
+            "n_subset (%d) > sequences in the fasta file (%d)."
+            % (args.n_subset, len(sequences)),
+            "Using all sequences to generate DeepSHAP reference.",
+        )
     reference = [
         sequences[i]
         for i in np.random.choice(
