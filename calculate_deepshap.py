@@ -177,7 +177,7 @@ def main():
     concat_explanations = []
     for k in hyp_explanations.keys():
         concat_explanations.append(
-            np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
+            np.concatenate([exp for exp in hyp_explanations[k]], axis=1)
         )
 
     if len(explainers) > 1:
