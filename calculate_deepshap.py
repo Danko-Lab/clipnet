@@ -176,12 +176,10 @@ def main():
             print([v.shape for v in shap_values])
             gc.collect()
 
-    concat_explanations = []
-    for k in hyp_explanations.keys():
-        concat_explanations.append(
-            np.concatenate([exp for exp in hyp_explanations[k]], axis=1)
-        )
-        print(concat_explanations[-1].shape)
+    concat_explanations = [
+        np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
+        for k in hyp_explanations.keys()
+    ]
 
     if len(explainers) > 1:
         mean_explanations = np.array(concat_explanations).mean(axis=0)
