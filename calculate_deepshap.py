@@ -173,7 +173,7 @@ def main():
             )
             hyp_explanations[i].append(shap_values)
             print(len(shap_values))
-            print(shap_values[0].shape)
+            print([v.shape for v in shap_values])
             gc.collect()
 
     concat_explanations = []
