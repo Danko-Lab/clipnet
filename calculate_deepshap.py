@@ -172,6 +172,7 @@ def main():
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
             hyp_explanations[i].append(shap_values)
+            print(shap_values.shape)
             gc.collect()
 
     concat_explanations = []
@@ -179,6 +180,7 @@ def main():
         concat_explanations.append(
             np.concatenate([exp for exp in hyp_explanations[k]], axis=1)
         )
+        print(concat_explanations[-1].shape)
 
     if len(explainers) > 1:
         mean_explanations = np.array(concat_explanations).mean(axis=0)
