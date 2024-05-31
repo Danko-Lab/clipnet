@@ -172,7 +172,8 @@ def main():
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
             hyp_explanations[i].append(shap_values)
-            print(shap_values.shape)
+            print(len(shap_values))
+            print(shap_values[0].shape)
             gc.collect()
 
     concat_explanations = []
