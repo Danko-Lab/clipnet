@@ -159,11 +159,11 @@ def main():
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    raw_explanations = {i: [] for i in range(len(explainers))}
+    hyp_explanations = {i: [] for i in range(len(explainers))}
     batch_size = 256
     for i, explainer in enumerate(explainers):
         desc = "Calculating explanations"
-        if len(explainers) == 1:
+        if len(explainers) > 1:
             desc += f" for model fold {i + 1}"
         for j in tqdm.tqdm(
             range(0, len(seqs_to_explain), batch_size), desc=desc, disable=args.silence
@@ -171,25 +171,25 @@ def main():
             shap_values = explainer.shap_values(
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
-            raw_explanations[i].append(shap_values)
+            hyp_explanations[i].append(shap_values)
             gc.collect()
 
     concat_explanations = []
-    for k in raw_explanations.keys():
+    for k in hyp_explanations.keys():
         concat_explanations.append(
-            np.concatenate([exp for exp in raw_explanations[k]], axis=1).sum(axis=0)
+            np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
         )
 
     if len(explainers) > 1:
         mean_explanations = np.array(concat_explanations).mean(axis=0)
     else:
         mean_explanations = concat_explanations[0]
-    scaled_explanations = mean_explanations * seqs_to_explain
+    explanations = mean_explanations * seqs_to_explain
 
     # Save scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Save DeepSHAP scores
-    np.savez_compressed(args.score_fp, scaled_explanations.swapaxes(1, 2))
+    np.savez_compressed(args.score_fp, explanations.swapaxes(1, 2))
     # Convert twohot to onehot and save
     np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
 
