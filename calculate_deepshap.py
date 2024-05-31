@@ -180,7 +180,7 @@ def main():
     print([exp.shape for exp in hyp_explanations[0][0]])
 
     concat_explanations = [
-        np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
+        np.concatenate([exp[0] for exp in hyp_explanations[k]], axis=0)
         for k in hyp_explanations.keys()
     ]
 
