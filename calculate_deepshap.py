@@ -153,7 +153,7 @@ def main():
             zip(models, contrib),
             desc="Creating explainers",
             total=len(models),
-            disable=args.silence,
+            disable=args.silence and len(models) > 1,
         )
     ]
 
