@@ -153,7 +153,7 @@ def main():
             zip(models, contrib),
             desc="Creating explainers",
             total=len(models),
-            disable=args.silence and len(models) > 1,
+            disable=args.silence or len(models) == 1,
         )
     ]
 
@@ -172,12 +172,7 @@ def main():
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
             hyp_explanations[i].append(shap_values)
-            print(len(shap_values))
-            print([v.shape for v in shap_values])
             gc.collect()
-
-    print([len(exp) for exp in hyp_explanations[0]])
-    print([exp.shape for exp in hyp_explanations[0][0]])
 
     concat_explanations = [
         np.concatenate([exp[0] for exp in hyp_explanations[k]], axis=0)
