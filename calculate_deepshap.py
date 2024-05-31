@@ -176,7 +176,8 @@ def main():
             print([v.shape for v in shap_values])
             gc.collect()
 
-    print([exp.shape for exp in hyp_explanations[0]])
+    print([len(exp) for exp in hyp_explanations[0]])
+    print([len(exp) for exp in hyp_explanations[0][0]])
 
     concat_explanations = [
         np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
