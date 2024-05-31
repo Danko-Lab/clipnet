@@ -99,7 +99,7 @@ def main():
         sequences[i]
         for i in np.random.choice(
             np.array(range(len(sequences))),
-            size=max(args.n_subset, len(sequences)),
+            size=min(args.n_subset, len(sequences)),
             replace=False,
         )
     ]
