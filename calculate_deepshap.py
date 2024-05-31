@@ -177,7 +177,7 @@ def main():
             gc.collect()
 
     print([len(exp) for exp in hyp_explanations[0]])
-    print([len(exp) for exp in hyp_explanations[0][0]])
+    print([exp.shape for exp in hyp_explanations[0][0]])
 
     concat_explanations = [
         np.concatenate([exp for exp in hyp_explanations[k]], axis=0)
