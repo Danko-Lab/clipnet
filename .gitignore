@@ -4,6 +4,11 @@ test.py
 data/scratch.fa
 data/*.fai
 data/*.fxi
+data/test_predictions.h5
+data/test_onehot.npz
+data/test_deepshap_profile.npz
+data/test_deepshap_quantity.npz
+data/test_ism.npz
 shap_requirements_old.txt
 shap_requirements_explicit.txt
 tf_requirements_explicit.txt
