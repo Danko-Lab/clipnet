@@ -40,13 +40,22 @@ def main():
         default=None,
         help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
     )
+    parser.add_argument(
+        "--n_gpus",
+        type=int,
+        default=0,
+        help="Number of GPUs to use. If not invoked, uses CPU.",
+    )
     args = parser.parse_args()
 
-    nn = (
-        clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu, prefix=args.prefix)
-        if args.gpu is not None
-        else clipnet.CLIPNET(n_gpus=0, prefix=args.prefix)
-    )
+    if args.n_gpus > 1:
+        nn = clipnet.CLIPNET(n_gpus=args.n_gpus, prefix=args.prefix)
+    else:
+        nn = (
+            clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu, prefix=args.prefix)
+            if args.gpu is not None
+            else clipnet.CLIPNET(n_gpus=0, prefix=args.prefix)
+        )
     nn.fit(model_dir=args.model_dir, resume_checkpoint=args.resume_checkpoint)
 
 
