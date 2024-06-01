@@ -82,27 +82,38 @@ def main():
         help="directory to save dataset params to (where models will be saved)",
     )
     parser.add_argument(
-        "--threads", type=int, default=9, help="number of threads to use"
+        "--threads",
+        type=int,
+        default=9,
+        help="number of threads to use. Only used if not --fold is not selected.",
+    )
+    parser.add_argument(
+        "--fold",
+        type=int,
+        default=None,
+        help="fold to calculate dataset params for (will only run one).",
     )
     args = parser.parse_args()
-    if args.threads == 1:
-        for i in range(9):
-            write_dataset_params(i, args.datadir, args.outdir)
-    elif args.threads > 1:
-        import itertools
-        import multiprocessing as mp
-
-        with mp.Pool(9) as p:
-            p.starmap(
-                write_dataset_params,
-                zip(
-                    range(9),
-                    itertools.repeat(args.datadir),
-                    itertools.repeat(args.outdir),
-                ),
-            )
+    assert args.threads > 0, "threads must be greater than 0"
+    if args.fold is not None:
+        write_dataset_params(args.fold, args.datadir, args.outdir)
     else:
-        raise ValueError("threads must be >= 1")
+        if args.threads == 1:
+            for i in range(9):
+                write_dataset_params(i, args.datadir, args.outdir)
+        elif args.threads > 1:
+            import itertools
+            import multiprocessing as mp
+
+            with mp.Pool(9) as p:
+                p.starmap(
+                    write_dataset_params,
+                    zip(
+                        range(9),
+                        itertools.repeat(args.datadir),
+                        itertools.repeat(args.outdir),
+                    ),
+                )
 
 
 if __name__ == "__main__":
