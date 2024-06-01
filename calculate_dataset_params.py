@@ -12,11 +12,11 @@ import numpy as np
 
 
 def write_dataset_params(i, datadir, outdir):
-    outdir = f"{outdir}/f{i + 1}/"
+    outdir = f"{outdir}/f{i}/"
     os.makedirs(outdir, exist_ok=True)
 
-    test_folds = [i + 1]
-    val_folds = [(i + 1) % 9 + 1]
+    test_folds = [i]
+    val_folds = [i % 9 + 1]
     train_folds = [j for j in range(1, 10) if j not in test_folds + val_folds]
     print(train_folds, val_folds, test_folds)
 
@@ -99,7 +99,7 @@ def main():
         write_dataset_params(args.fold, args.datadir, args.outdir)
     else:
         if args.threads == 1:
-            for i in range(9):
+            for i in range(1, 10):
                 write_dataset_params(i, args.datadir, args.outdir)
         elif args.threads > 1:
             import itertools
@@ -109,7 +109,7 @@ def main():
                 p.starmap(
                     write_dataset_params,
                     zip(
-                        range(9),
+                        range(1, 10),
                         itertools.repeat(args.datadir),
                         itertools.repeat(args.outdir),
                     ),
