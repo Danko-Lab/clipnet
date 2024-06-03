@@ -79,6 +79,33 @@ def get_twohot(seq):
     return TwoHotDNA(seq).twohot
 
 
+def get_twohot_from_series(series, cores=8, desc="Twohot encoding", silence=False):
+    """Extracts just the twohot encoding from TwoHotDNA.
+
+    Given a pandas series of sequences, returns an twohot-encoded array (n, len, 4)
+    array of all sequences.
+    """
+    if cores > 1:
+        # Use multiprocessing to parallelize twohot encoding
+        import multiprocessing as mp
+
+        pool = mp.Pool(min(cores, mp.cpu_count()))
+        twohot_encoded = list(
+            tqdm.tqdm(
+                pool.imap(get_twohot, series.to_list()),
+                total=len(series),
+                desc=desc,
+                disable=silence,
+            )
+        )
+    else:
+        twohot_encoded = [
+            get_twohot(seq)
+            for seq in tqdm.tqdm(series.to_list(), desc=desc, disable=silence)
+        ]
+    return np.array(twohot_encoded)
+
+
 def gz_read(fp):
     """Handles opening gzipped or non-gzipped files to read mode."""
     ext = os.path.splitext(fp)[-1]
