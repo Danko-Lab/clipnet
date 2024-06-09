@@ -16,7 +16,7 @@ pyfastx~=1.1
 pysam~=0.21.0
 pip
 scipy
-shap
+shap==0.44.1
 tensorflow==2.14.0
 seqlogo
 tqdm
