@@ -76,10 +76,8 @@ def main():
     args = parser.parse_args()
     np.random.seed(args.seed)
 
-    assert args.mode in [
-        "quantity",
-        "profile",
-    ], "mode must be either quantity or profile."
+    if args.mode not in ["quantity", "profile"]:
+        raise ValueError("mode must be either 'quantity' or 'profile'.")
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -116,7 +114,8 @@ def main():
 
     if args.gpu is not None:
         gpus = tf.config.experimental.list_physical_devices("GPU")
-        assert args.gpu < len(gpus), f"Requested GPU {args.gpu} does not exist."
+        if args.gpu >= len(gpus):
+            raise IndexError(f"Requested GPU index {args.gpu} does not exist ({len(gpus)} total).")
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         gpus = tf.config.list_physical_devices("GPU")

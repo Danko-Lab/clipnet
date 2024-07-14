@@ -73,21 +73,21 @@ class CLIPNET:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def __gpu_settings(self):
-        assert self.n_gpus >= 0, "n_gpus must be an integer >= 0."
         if self.n_gpus == 0:
             print("Requested 0 GPUs. Turning off GPUs.")
             tf.config.set_visible_devices([], "GPU")
             self.strategy = tf.distribute.get_strategy()
-        else:
+        elif self.n_gpus >= 1:
             gpus = tf.config.experimental.list_physical_devices("GPU")
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
             if self.n_gpus == 1:
                 gpus = tf.config.list_physical_devices("GPU")
                 if self.use_specific_gpu is not None:
-                    assert self.use_specific_gpu < len(
-                        gpus
-                    ), f"Requested GPU index {self.use_specific_gpu} does not exist."
+                    if self.use_specific_gpu >= len(gpus):
+                        raise IndexError(
+                            f"Requested GPU index {self.use_specific_gpu} does not exist."
+                        )
                     gpu = gpus[self.use_specific_gpu]
                 else:
                     gpu = gpus[GPUtil.getAvailable()[0]]
@@ -95,14 +95,17 @@ class CLIPNET:
                 tf.config.set_visible_devices(gpu, "GPU")
                 self.strategy = tf.distribute.get_strategy()
             else:
-                assert self.n_gpus <= len(
-                    gpus
-                ), f"n_gpus ({self.n_gpus}) requested exceeds number of GPUs \
-                    ({len(gpus)}) available."
+                if self.n_gpus > len(gpus):
+                    raise ValueError(
+                        f"n_gpus ({self.n_gpus}) requested exceeds number of GPUs \
+                        ({len(gpus)}) available."
+                    )
                 gpu_names = [gpu.name.split("physical_device:")[1] for gpu in gpus]
                 self.strategy = tf.distribute.MirroredStrategy(
                     devices=gpu_names[: self.n_gpus]
                 )
+        else:
+            raise ValueError("n_gpus must be a positive integer.")
 
     def set_n_gpus(self, n_gpus):
         """Reset number of GPUs."""

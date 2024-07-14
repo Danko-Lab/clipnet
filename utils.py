@@ -244,22 +244,14 @@ def slice_procap(procap, pad):
         return procap[:, slc]
 
 
-def check_dimensions(seq, procap, dnase=None):
-    """Check that dimensions are correct. DNase will be ignored if it is None."""
-    assert (
-        seq.shape[0] == procap.shape[0]
-    ), f"n_samples: seq={seq.shape[0]}, procap={procap.shape[0]}."
-    assert (
-        seq.shape[1] == procap.shape[1] / 2
-    ), f"len(windows): seq={seq.shape[1]}, procap={procap.shape[1]}."
-    if dnase is not None:
-        assert (
-            seq.shape[0] == dnase.shape[0]
-        ), f"n_samples: seq,procap={seq.shape[0]}, dnase={dnase.shape[0]}"
-        assert (
-            seq.shape[1] == dnase.shape[1] == procap.shape[1] / 2
-        ), f"len(windows): seq,procap={seq.shape[1]}, dnase={dnase.shape[1]}"
-    assert seq.shape[2] == 4, "seq dummy variables = %d." % seq.shape[2]
+def check_dimensions(seq, procap):
+    """Check that dimensions are correct."""
+    if seq.shape[0] != procap.shape[0]:
+        raise ValueError(f"n_samples: seq={seq.shape[0]}, procap={procap.shape[0]}.")
+    if seq.shape[1] != procap.shape[1] / 2:
+        raise ValueError(f"len(windows): seq={seq.shape[1]}, procap={procap.shape[1]}.")
+    if seq.shape[2] != 4:
+        raise ValueError(f"seq dummy variables = {seq.shape[2]}.")
 
 
 # The following functions are adapted from DeepLIFT and https://alextseng.net/blog/posts/20201122-kmer-shuffles/:
@@ -278,7 +270,8 @@ def char_array_to_string(arr):
     Converts a NumPy array of byte-long ASCII codes into an ASCII string.
     e.g. [65, 67, 71, 84] becomes "ACGT".
     """
-    assert arr.dtype == np.int8
+    if arr.dtype != np.int8:
+        raise ValueError("Array must be of type np.int8")
     return arr.tostring().decode("ascii")
 
 
@@ -402,7 +395,8 @@ def plot_side(arr, ylim=[-2, 2.5], yticks=[0, 2], xticks=[], pic_name=None):
     """
     Adapted from APARENT code (Bogard et al. 2019)
     """
-    assert arr.shape[0] % 2 == 0, "arr must have even length."
+    if arr.shape[0] % 2 != 0:
+        raise ValueError("arr must have even length.")
     midpoint = int(arr.shape[0] / 2)
     pl = arr[:midpoint]
     mn = arr[midpoint:]
@@ -431,7 +425,8 @@ def plot_side(arr, ylim=[-2, 2.5], yticks=[0, 2], xticks=[], pic_name=None):
 def plot_side_stacked(
     arr0, arr1, ylim=[-1, 1], yticks=[0, 1], xticks=[], pic_name=None
 ):
-    assert arr0.shape[0] % 2 == 0, "arr must have even length."
+    if arr.shape[0] % 2 != 0:
+        raise ValueError("arr must have even length.")
     midpoint = int(arr0.shape[0] / 2)
     pl0 = arr0[:midpoint]
     mn0 = arr0[midpoint:]
@@ -632,10 +627,12 @@ def plot_weights_given_ax(
     """
     if len(array.shape) == 3:
         array = np.squeeze(array)
-    assert len(array.shape) == 2, array.shape
+    if array.shape[0] % 2 != 0:
+        raise ValueError("arr must have even length.")
     if array.shape[0] == 4 and array.shape[1] != 4:
         array = array.transpose(1, 0)
-    assert array.shape[1] == 4
+    if array.shape[1] % 4 != 0:
+        raise ValueError("Incorrect number of nucleotide dummy variables.")
     max_pos_height = 0.0
     min_neg_height = 0.0
     heights_at_positions = []
@@ -666,7 +663,10 @@ def plot_weights_given_ax(
     # the highlight dict should be the color
     for color in highlight:
         for start_pos, end_pos in highlight[color]:
-            assert start_pos >= 0.0 and end_pos <= array.shape[0]
+            if start_pos < 0.0 or end_pos > array.shape[0]:
+                raise ValueError(
+                    "Highlight positions must be within the bounds of the sequence."
+                )
             min_depth = np.min(depths_at_positions[start_pos:end_pos])
             max_height = np.max(heights_at_positions[start_pos:end_pos])
             ax.add_patch(

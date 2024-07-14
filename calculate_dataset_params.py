@@ -94,7 +94,8 @@ def main():
         help="fold to calculate dataset params for (will only run one).",
     )
     args = parser.parse_args()
-    assert args.threads > 0, "threads must be greater than 0"
+    if args.threads <= 0:
+        raise ValueError("--threads must be a positive integer")
     if args.fold is not None:
         write_dataset_params(args.fold, args.datadir, args.outdir)
     else:

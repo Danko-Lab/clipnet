@@ -40,15 +40,19 @@ def main():
             observed = observed["arr_0"]
     elif args.observed.endswith(".csv.gz") or args.observed.endswith(".csv"):
         observed = pd.read_csv(args.observed, header=None).to_numpy()
-    assert (
-        track.shape[0] == observed.shape[0]
-    ), f"n predictions ({track.shape[0]}) and n observed ({observed.shape[0]}) do not match."
-    assert (
-        track.shape[1] <= observed.shape[1]
-    ), f"Predicted tracks ({track.shape[1]}) are longer than observed ({observed.shape[1]})."
-    assert (
-        observed.shape[1] - track.shape[1]
-    ) % 4 == 0, f"Padding around predicted tracks must be divisible by 4. {observed.shape[1] - track.shape[1]}"
+
+    if track.shape[0] != observed.shape[0]:
+        raise ValueError(
+            f"n predictions ({track.shape[0]}) and n observed ({observed.shape[0]}) do not match."
+        )
+    if track.shape[1] > observed.shape[1]:
+        raise ValueError(
+            f"Predicted tracks ({track.shape[1]}) are longer than observed ({observed.shape[1]})."
+        )
+    if (observed.shape[1] - track.shape[1]) % 4 == 0:
+        raise ValueError(
+            f"Padding around predicted tracks must be divisible by 4. {observed.shape[1] - track.shape[1]}"
+        )
     start = (observed.shape[1] - track.shape[1]) // 4
     end = observed.shape[1] // 2 - start
     observed_clipped = observed[
