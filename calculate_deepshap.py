@@ -138,7 +138,7 @@ def main():
         contrib = [model.output[1] for model in models]
         check_additivity = True
     else:
-        softmax = tf.keras.layers.activations.Softmax()
+        softmax = tf.keras.layers.Softmax()
         contrib = [
             tf.reduce_mean(
                 tf.stop_gradient(softmax(model.output[0])) * model.output[0],
