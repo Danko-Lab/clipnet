@@ -115,7 +115,9 @@ def main():
     if args.gpu is not None:
         gpus = tf.config.experimental.list_physical_devices("GPU")
         if args.gpu >= len(gpus):
-            raise IndexError(f"Requested GPU index {args.gpu} does not exist ({len(gpus)} total).")
+            raise IndexError(
+                f"Requested GPU index {args.gpu} does not exist ({len(gpus)} total)."
+            )
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         gpus = tf.config.list_physical_devices("GPU")
@@ -145,7 +147,7 @@ def main():
             )
             for model in models
         ]
-        check_additivity = False
+        # check_additivity = False
     explainers = [
         shap.DeepExplainer((model.input, contrib), twohot_reference)
         for (model, contrib) in tqdm.tqdm(
