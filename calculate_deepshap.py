@@ -138,16 +138,16 @@ def main():
         contrib = [model.output[1] for model in models]
         check_additivity = True
     else:
-        softmax = tf.keras.layers.activations.Softmax()
+        # softmax = tf.keras.layers.activations.Softmax()
         contrib = [
             tf.reduce_mean(
-                tf.stop_gradient(softmax(model.output[0])) * model.output[0],
+                tf.stop_gradient(tf.nn.softmax(model.output[0])) * model.output[0],
                 axis=-1,
                 keepdims=True,
             )
             for model in models
         ]
-        # check_additivity = False
+        check_additivity = True
     explainers = [
         shap.DeepExplainer((model.input, contrib), twohot_reference)
         for (model, contrib) in tqdm.tqdm(
