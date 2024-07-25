@@ -73,6 +73,11 @@ def main():
         action="store_true",
         help="Disables progress bars and other non-essential print statements.",
     )
+    parser.add_argument(
+        "--skip_check_additivity",
+        action="store_true",
+        help="Disables check for additivity of shap results.",
+    )
     args = parser.parse_args()
     np.random.seed(args.seed)
 
@@ -136,7 +141,7 @@ def main():
         models = [tf.keras.models.load_model(args.model_fp, compile=False)]
     if args.mode == "quantity":
         contrib = [model.output[1] for model in models]
-        check_additivity = True
+        check_additivity = not args.skip_check_additivity
     else:
         softmax = tf.keras.layers.Softmax()
         contrib = [
@@ -147,7 +152,7 @@ def main():
             )
             for model in models
         ]
-        check_additivity = True
+        check_additivity = not args.skip_check_additivity
     explainers = [
         shap.DeepExplainer((model.input, contrib), twohot_reference)
         for (model, contrib) in tqdm.tqdm(
