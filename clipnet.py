@@ -293,7 +293,7 @@ class CLIPNET:
         """
         if os.path.splitext(fasta_fp)[-1] == ".npz":
             sequence = np.load(fasta_fp)["arr_0"]
-        if os.path.splitext(fasta_fp)[-1] == ".npy":
+        elif os.path.splitext(fasta_fp)[-1] == ".npy":
             sequence = np.load(fasta_fp)
         else:
             sequence = utils.get_twohot_fasta_sequences(fasta_fp, silence=silence)
