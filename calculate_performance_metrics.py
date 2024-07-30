@@ -49,9 +49,9 @@ def main():
         raise ValueError(
             f"Predicted tracks ({track.shape[1]}) are longer than observed ({observed.shape[1]})."
         )
-    if (observed.shape[1] - track.shape[1]) % 4 == 0:
+    if (observed.shape[1] - track.shape[1]) % 4 != 0:
         raise ValueError(
-            f"Padding around predicted tracks must be divisible by 4. {observed.shape[1] - track.shape[1]}"
+            f"Padding around predicted tracks ({observed.shape[1] - track.shape[1]}) must be divisible by 4."
         )
     start = (observed.shape[1] - track.shape[1]) // 4
     end = observed.shape[1] // 2 - start
