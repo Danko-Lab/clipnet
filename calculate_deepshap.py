@@ -44,6 +44,12 @@ def main():
             Selecting this option will override --model_dir.",
     )
     parser.add_argument(
+        "--hyp_attr_fp",
+        type=str,
+        default=None,
+        help="Where to write hypothetical attributions.",
+    )
+    parser.add_argument(
         "--mode",
         type=str,
         default="quantity",
@@ -65,7 +71,7 @@ def main():
     parser.add_argument(
         "--seed",
         type=int,
-        default=617,
+        default=None,
         help="Random seed for selecting background sequences.",
     )
     parser.add_argument(
@@ -81,6 +87,10 @@ def main():
     args = parser.parse_args()
     np.random.seed(args.seed)
 
+    if args.model_fp is not None and args.model_dir is not None:
+        raise ValueError("Cannot specify both --model_fp and --model_dir.")
+    if args.model_fp is None and args.model_dir is None:
+        raise ValueError("Must specify either --model_fp or --model_dir.")
     if args.mode not in ["quantity", "profile"]:
         raise ValueError("mode must be either 'quantity' or 'profile'.")
 
@@ -107,7 +117,8 @@ def main():
         )
     ]
     shuffled_reference = [
-        utils.kshuffle(rec.seq, random_seed=args.seed)[0] for rec in reference
+        utils.kshuffle(rec.seq, random_seed=np.random.RandomState(args.random_seed))[0]
+        for rec in reference
     ]
 
     # Two-hot encode shuffled sequences
@@ -197,6 +208,8 @@ def main():
     np.savez_compressed(args.score_fp, explanations.swapaxes(1, 2))
     # Convert twohot to onehot and save
     np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
+    if args.hyp_attr_fp is not None:
+        np.savez_compressed(args.hyp_attr_fp, mean_explanations.swapaxes(1, 2))
 
 
 if __name__ == "__main__":

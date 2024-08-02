@@ -72,9 +72,10 @@ class CGen(tf.keras.utils.Sequence):
         intrashuffle=True,
     ):
         # Check that lists of folds are all the same
-        assert len(seq_folds) == len(
-            procap_folds
-        ), f"lengths: seq_folds = {seq_folds}, procap_folds = {procap_folds}."
+        if len(seq_folds) != len(procap_folds):
+            raise ValueError(
+                f"lengths: seq_folds = {seq_folds}, procap_folds = {procap_folds}."
+            )
         self.seq_folds = seq_folds
         self.procap_folds = procap_folds
         self.fold_list = np.arange(len(self.seq_folds))
