@@ -117,7 +117,7 @@ def main():
         )
     ]
     shuffled_reference = [
-        utils.kshuffle(rec.seq, random_seed=np.random.RandomState(args.random_seed))[0]
+        utils.kshuffle(rec.seq, random_seed=np.random.RandomState(args.seed))[0]
         for rec in reference
     ]
 
