@@ -117,8 +117,7 @@ def main():
         )
     ]
     shuffled_reference = [
-        utils.kshuffle(rec.seq, random_seed=np.random.RandomState(args.seed))[0]
-        for rec in reference
+        utils.kshuffle(rec.seq, random_seed=args.seed)[0] for rec in reference
     ]
 
     # Two-hot encode shuffled sequences
