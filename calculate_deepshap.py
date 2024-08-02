@@ -87,8 +87,8 @@ def main():
     args = parser.parse_args()
     np.random.seed(args.seed)
 
-    if args.model_fp is not None and args.model_dir is not None:
-        raise ValueError("Cannot specify both --model_fp and --model_dir.")
+    # if args.model_fp is not None and args.model_dir is not None:
+    #    raise ValueError("Cannot specify both --model_fp and --model_dir.")
     if args.model_fp is None and args.model_dir is None:
         raise ValueError("Must specify either --model_fp or --model_dir.")
     if args.mode not in ["quantity", "profile"]:
