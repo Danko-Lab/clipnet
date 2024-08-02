@@ -33,7 +33,7 @@ def main():
     parser.add_argument(
         "--model_dir",
         type=str,
-        default="ensemble_models",
+        default=None,
         help="Directory to load models from",
     )
     parser.add_argument(
