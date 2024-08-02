@@ -1,5 +1,5 @@
 """
-Important helper functions for clipnet_generator.
+Important helper functions for CLIPNET (mostly data loading and plotting).
 """
 
 import gzip
