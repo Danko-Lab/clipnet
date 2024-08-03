@@ -164,7 +164,7 @@ def get_twohot_fasta_sequences(
     fasta_fp, cores=8, desc="Twohot encoding", silence=False
 ):
     """
-    Given a fasta file with each record, returns an twohot-encoded array (n, len, 4)
+    Given a fasta file with each record, returns a twohot-encoded array (n, len, 4)
     array of all sequences.
     """
     fa = pyfastx.Fasta(fasta_fp)
