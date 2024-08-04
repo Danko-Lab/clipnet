@@ -1,9 +1,11 @@
 """
 Calculate contribution scores using shap.DeepExplainer.
+Also contains some wrapper and utility functions used in scripts that make use of shap.
 """
 
 import argparse
 import gc
+import glob
 import logging
 import os
 
@@ -25,6 +27,88 @@ shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
 tf.compat.v1.disable_v2_behavior()
 
 
+def quantity_contrib(model):
+    return model.output[1]
+
+
+def profile_contrib(model):
+    softmax = tf.keras.layers.Softmax()
+    contrib = tf.reduce_mean(
+        tf.stop_gradient(softmax(model.output[0])) * model.output[0],
+        axis=-1,
+        keepdims=True,
+    )
+    return contrib
+
+
+def load_seqs(fasta_fp, background_fp=None, n_subset=100, seed=None):
+    np.random.seed(seed)
+    seqs_to_explain = pyfastx.Fasta(fasta_fp)
+    background_seqs = (
+        seqs_to_explain if background_fp is None else pyfastx.Fasta(background_fp)
+    )
+    reference = [
+        background_seqs[i]
+        for i in np.random.choice(
+            np.array(range(len(background_seqs))),
+            size=min(100, len(background_seqs)),
+            replace=False,
+        )
+    ]
+    shuffled_reference = [
+        utils.kshuffle(rec.seq, random_seed=seed)[0] for rec in reference
+    ]
+    twohot_background = np.array(
+        [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
+    )
+    return seqs_to_explain, twohot_background
+
+
+def create_explainers(
+    model_fps, twohot_background, contrib=quantity_contrib, silence=False
+):
+    models = [
+        tf.keras.models.load_model(fp, compile=False)
+        for fp in tqdm.tqdm(model_fps, desc="Loading models")
+    ]
+    explainers = []
+    for model in tqdm.tqdm(models, desc="Creating explainers", disable=silence):
+        explainers.append(
+            shap.DeepExplainer((model.input, contrib(model)), twohot_background)
+        )
+    return explainers
+
+
+def calculate_scores(
+    explainers, seqs_to_explain, batch_size=256, silence=False, check_additivity=True
+):
+    hyp_explanations = {i: [] for i in range(len(explainers))}
+    for i, explainer in enumerate(explainers):
+        desc = "Calculating explanations"
+        if len(explainers) > 1:
+            desc += f" for model fold {i + 1}"
+        for j in tqdm.tqdm(
+            range(0, len(seqs_to_explain), batch_size), desc=desc, disable=silence
+        ):
+            shap_values = explainer.shap_values(
+                seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
+            )
+            hyp_explanations[i].append(shap_values)
+            gc.collect()
+
+    concat_explanations = [
+        np.concatenate([exp[0] for exp in hyp_explanations[k]], axis=0)
+        for k in hyp_explanations.keys()
+    ]
+
+    if len(explainers) > 1:
+        mean_explanations = np.array(concat_explanations).mean(axis=0)
+    else:
+        mean_explanations = concat_explanations[0]
+    explanations = mean_explanations * seqs_to_explain
+    return explanations, mean_explanations
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
@@ -33,7 +117,7 @@ def main():
     parser.add_argument(
         "--model_dir",
         type=str,
-        default=None,
+        default="ensemble_models/",
         help="Directory to load models from",
     )
     parser.add_argument(
@@ -85,121 +169,44 @@ def main():
         help="Disables check for additivity of shap results.",
     )
     args = parser.parse_args()
-    np.random.seed(args.seed)
 
-    # if args.model_fp is not None and args.model_dir is not None:
-    #    raise ValueError("Cannot specify both --model_fp and --model_dir.")
     if args.model_fp is None and args.model_dir is None:
         raise ValueError("Must specify either --model_fp or --model_dir.")
-    if args.mode not in ["quantity", "profile"]:
-        raise ValueError("mode must be either 'quantity' or 'profile'.")
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    sequences = pyfastx.Fasta(args.fasta_fp)
-    seqs_to_explain = utils.get_twohot_fasta_sequences(
-        args.fasta_fp, silence=args.silence
+    seqs_to_explain, twohot_background = load_seqs(
+        args.fasta_fp, n_subset=args.n_subset, seed=args.seed
     )
 
-    # Perform dinucleotide shuffle on n_subset random sequences
-    if args.n_subset > len(sequences):
-        print(
-            "n_subset (%d) > sequences in the fasta file (%d)."
-            % (args.n_subset, len(sequences)),
-            "Using all sequences to generate DeepSHAP reference.",
-        )
-    reference = [
-        sequences[i]
-        for i in np.random.choice(
-            np.array(range(len(sequences))),
-            size=min(args.n_subset, len(sequences)),
-            replace=False,
-        )
-    ]
-    shuffled_reference = [
-        utils.kshuffle(rec.seq, random_seed=args.seed)[0] for rec in reference
-    ]
+    # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    # Two-hot encode shuffled sequences
-    twohot_reference = np.array(
-        [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
-    )
-
-    # Load model and create explainer ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    if args.gpu is not None:
-        gpus = tf.config.experimental.list_physical_devices("GPU")
-        if args.gpu >= len(gpus):
-            raise IndexError(
-                f"Requested GPU index {args.gpu} does not exist ({len(gpus)} total)."
-            )
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        gpus = tf.config.list_physical_devices("GPU")
-        gpu = gpus[args.gpu]
-        print(f"Using GPU {gpu}.")
-        tf.config.set_visible_devices(gpu, "GPU")
-
-    if args.model_fp is None:
-        models = [
-            tf.keras.models.load_model(f"{args.model_dir}/fold_{i}.h5", compile=False)
-            for i in tqdm.tqdm(
-                range(1, 10), desc="Loading models", disable=args.silence
-            )
-        ]
-    else:
-        models = [tf.keras.models.load_model(args.model_fp, compile=False)]
     if args.mode == "quantity":
-        contrib = [model.output[1] for model in models]
-        check_additivity = not args.skip_check_additivity
+        contrib = quantity_contrib
+    elif args.mode == "profile":
+        contrib = profile_contrib
     else:
-        softmax = tf.keras.layers.Softmax()
-        contrib = [
-            tf.reduce_mean(
-                tf.stop_gradient(softmax(model.output[0])) * model.output[0],
-                axis=-1,
-                keepdims=True,
-            )
-            for model in models
+        raise ValueError(f"Invalid mode: {args.mode}. Must be 'quantity' or 'profile'.")
+
+    if args.model_fp is not None:
+        model_fps = [args.model_fp]
+    else:
+        model_fps = [
+            glob.glob(os.path.join(args.model_dir, "*.h5"))[0] for i in range(5)
         ]
-        check_additivity = not args.skip_check_additivity
-    explainers = [
-        shap.DeepExplainer((model.input, contrib), twohot_reference)
-        for (model, contrib) in tqdm.tqdm(
-            zip(models, contrib),
-            desc="Creating explainers",
-            total=len(models),
-            disable=args.silence or len(models) == 1,
-        )
-    ]
+    explainers = create_explainers(
+        model_fps, twohot_background, contrib, args.silence or len(model_fps) == 1
+    )
 
     # Calculate scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    hyp_explanations = {i: [] for i in range(len(explainers))}
-    batch_size = 256
-    for i, explainer in enumerate(explainers):
-        desc = "Calculating explanations"
-        if len(explainers) > 1:
-            desc += f" for model fold {i + 1}"
-        for j in tqdm.tqdm(
-            range(0, len(seqs_to_explain), batch_size), desc=desc, disable=args.silence
-        ):
-            shap_values = explainer.shap_values(
-                seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
-            )
-            hyp_explanations[i].append(shap_values)
-            gc.collect()
-
-    concat_explanations = [
-        np.concatenate([exp[0] for exp in hyp_explanations[k]], axis=0)
-        for k in hyp_explanations.keys()
-    ]
-
-    if len(explainers) > 1:
-        mean_explanations = np.array(concat_explanations).mean(axis=0)
-    else:
-        mean_explanations = concat_explanations[0]
-    explanations = mean_explanations * seqs_to_explain
+    explanations, mean_explanations = calculate_scores(
+        explainers,
+        seqs_to_explain,
+        batch_size=256,
+        silence=args.silence,
+        check_additivity=not args.skip_check_additivity,
+    )
 
     # Save scores ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

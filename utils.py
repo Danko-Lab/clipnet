@@ -13,6 +13,10 @@ import pyfastx
 import tqdm
 
 
+def get_mut_bases(base):
+    return [mut for mut in ["A", "C", "G", "T"] if mut != base]
+
+
 class TwoHotDNA:
     """
     Allows you to access id, seq, and twohot(seq) as attributes. Handles IUPAC ambiguity
