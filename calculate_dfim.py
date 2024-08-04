@@ -87,10 +87,10 @@ def main():
         help="Calculate contrib scores for quantity or profile.",
     )
     parser.add_argument(
-        "--gpu",
-        type=int,
-        default=None,
-        help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
+        "--start", type=int, default=400, help="Start position for calculating DFIM."
+    )
+    parser.add_argument(
+        "--stop", type=int, default=600, help="Stop position for calculating DFIM."
     )
     parser.add_argument(
         "--background_fp",
@@ -104,6 +104,12 @@ def main():
         default=100,
         help="Maximum number of sequences to use as background. \
             Default is 100 to ensure reasonably fast compute on large datasets.",
+    )
+    parser.add_argument(
+        "--gpu",
+        type=int,
+        default=None,
+        help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
     )
     parser.add_argument(
         "--seed",
