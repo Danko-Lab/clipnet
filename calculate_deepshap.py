@@ -191,7 +191,7 @@ def main():
     if args.model_fp is not None:
         model_fps = [args.model_fp]
     else:
-        model_fps = list(glob.glob(os.path.join(args.model_dir, "*.h5"))[0])
+        model_fps = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
     explainers = create_explainers(
         model_fps, twohot_background, contrib, args.silence or len(model_fps) == 1
     )
