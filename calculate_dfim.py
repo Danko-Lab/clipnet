@@ -8,14 +8,16 @@ import logging
 import os
 
 import numpy as np
-import shap
-import tensorflow as tf
 import tqdm
 
 import utils
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
+
+import shap
+import tensorflow as tf
+
 from calculate_deepshap import (
     create_explainers,
     load_seqs,
