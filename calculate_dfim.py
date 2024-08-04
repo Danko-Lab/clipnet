@@ -135,7 +135,7 @@ def main():
         contrib = profile_contrib
     else:
         raise ValueError(f"Invalid mode: {args.mode}. Must be 'quantity' or 'profile'.")
-    model_fps = [glob.glob(os.path.join(args.model_dir, "*.h5"))[0] for i in range(5)]
+    model_fps = list(glob.glob(os.path.join(args.model_dir, "*.h5"))[0])
     explainers = create_explainers(model_fps, twohot_background, contrib, args.silence)
 
     # Calculate DFIM
