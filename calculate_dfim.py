@@ -148,7 +148,9 @@ def main():
         )
         for rec in seqs_to_explain
     }
-    return dfims
+
+    # Save scores
+    np.savez(args.score_fp, **dfims)
 
 
 if __name__ == "__main__":
