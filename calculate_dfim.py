@@ -18,6 +18,7 @@ logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import shap
 import tensorflow as tf
 
+import clipnet
 from calculate_deepshap import (
     create_explainers,
     load_seqs,
@@ -135,6 +136,7 @@ def main():
     )
 
     # Create explainers
+    nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
     if args.mode == "quantity":
         contrib = quantity_contrib
     elif args.mode == "profile":

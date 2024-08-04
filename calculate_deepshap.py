@@ -20,6 +20,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
 import tensorflow as tf
 
+import clipnet
+
 # This will fix an error message for running tf.__version__==2.5
 shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
     shap.explainers._deep.deep_tf.passthrough
@@ -181,6 +183,7 @@ def main():
 
     # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
     if args.mode == "quantity":
         contrib = quantity_contrib
     elif args.mode == "profile":
