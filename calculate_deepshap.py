@@ -172,8 +172,17 @@ def main():
     )
     args = parser.parse_args()
 
+    # Check arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     if args.model_fp is None and args.model_dir is None:
         raise ValueError("Must specify either --model_fp or --model_dir.")
+
+    if args.mode == "quantity":
+        contrib = quantity_contrib
+    elif args.mode == "profile":
+        contrib = profile_contrib
+    else:
+        raise ValueError(f"Invalid mode: {args.mode}. Must be 'quantity' or 'profile'.")
 
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -184,12 +193,6 @@ def main():
     # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
-    if args.mode == "quantity":
-        contrib = quantity_contrib
-    elif args.mode == "profile":
-        contrib = profile_contrib
-    else:
-        raise ValueError(f"Invalid mode: {args.mode}. Must be 'quantity' or 'profile'.")
 
     if args.model_fp is not None:
         model_fps = [args.model_fp]
@@ -215,6 +218,7 @@ def main():
     np.savez_compressed(args.score_fp, explanations.swapaxes(1, 2))
     # Convert twohot to onehot and save
     np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
+    # Save hypothetical attributions
     if args.hyp_attr_fp is not None:
         np.savez_compressed(args.hyp_attr_fp, mean_explanations.swapaxes(1, 2))
 
