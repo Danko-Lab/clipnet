@@ -429,7 +429,7 @@ def plot_side(arr, ylim=[-2, 2.5], yticks=[0, 2], xticks=[], pic_name=None):
 def plot_side_stacked(
     arr0, arr1, ylim=[-1, 1], yticks=[0, 1], xticks=[], pic_name=None
 ):
-    if arr.shape[0] % 2 != 0:
+    if arr0.shape[0] % 2 != 0 or arr1.shape[0] % 2 != 0:
         raise ValueError("arr must have even length.")
     midpoint = int(arr0.shape[0] / 2)
     pl0 = arr0[:midpoint]

@@ -82,7 +82,7 @@ def create_explainers(
 
 
 def calculate_scores(
-    explainers, seqs_to_explain, batch_size=256, silence=False, check_additivity=True
+    explainers, seqs_to_explain, batch_size=256, check_additivity=True, silence=False
 ):
     hyp_explanations = {i: [] for i in range(len(explainers))}
     for i, explainer in enumerate(explainers):
