@@ -75,14 +75,14 @@ def main():
     )
     quantity_spearman = spearmanr(quantity, observed_clipped.sum(axis=1))
 
-    print(f"Median Track Pearson: {track_pearson.median():.4f}.")
+    print(f"Median Track Pearson: {track_pearson.median():.4f}")
     print(
-        f"Mean Track Pearson: {track_pearson.mean():.4f}."
-        + f" +/- {track_pearson.std():.4f}"
+        f"Mean Track Pearson: {track_pearson.mean():.4f} "
+        + f"+/- {track_pearson.std():.4f}"
     )
-    print(f"Median Track JS Distance: {pd.Series(track_js_distance).median():.4f}")
+    print(f"Median Track JS Distance: {pd.Series(track_js_distance).median():.4f} ")
     print(
-        f"Mean Track JS Distance: {pd.Series(track_js_distance).mean():.4f}"
+        f"Mean Track JS Distance: {pd.Series(track_js_distance).mean():.4f} "
         + f"+/- {pd.Series(track_js_distance).std():.4f}"
     )
     print(f"Track Directionality Pearson: {directionality_pearson[0]:.4f}")
