@@ -65,7 +65,7 @@ def load_seqs(fasta_fp, return_twohot_explains=True, background_fp=None, n_subse
     )
     if return_twohot_explains:
         seqs_to_explain = np.array(
-            [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
+            [utils.TwoHotDNA(seq).twohot for seq in seqs_to_explain]
         )
     return seqs_to_explain, twohot_background
 
