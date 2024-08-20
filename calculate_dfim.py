@@ -144,7 +144,7 @@ def main():
     # Load sequences ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     seqs_to_explain, twohot_background = load_seqs(
-        args.fasta_fp, args.background_fp, args.n_subset, args.seed
+        args.fasta_fp, False, args.background_fp, args.n_subset, args.seed
     )
 
     # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

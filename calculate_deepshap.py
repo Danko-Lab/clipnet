@@ -43,7 +43,7 @@ def profile_contrib(model):
     return contrib
 
 
-def load_seqs(fasta_fp, background_fp=None, n_subset=100, seed=None):
+def load_seqs(fasta_fp, return_twohot_explains=True, background_fp=None, n_subset=100, seed=None):
     np.random.seed(seed)
     seqs_to_explain = pyfastx.Fasta(fasta_fp)
     background_seqs = (
@@ -63,6 +63,10 @@ def load_seqs(fasta_fp, background_fp=None, n_subset=100, seed=None):
     twohot_background = np.array(
         [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
     )
+    if return_twohot_explains:
+        seqs_to_explain = np.array(
+            [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
+        )
     return seqs_to_explain, twohot_background
 
 
@@ -92,8 +96,6 @@ def calculate_scores(
         for j in tqdm.tqdm(
             range(0, len(seqs_to_explain), batch_size), desc=desc, disable=silence
         ):
-            print(seqs_to_explain.shape)
-            print(j, batch_size)
             shap_values = explainer.shap_values(
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
