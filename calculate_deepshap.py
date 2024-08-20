@@ -53,7 +53,7 @@ def load_seqs(fasta_fp, background_fp=None, n_subset=100, seed=None):
         background_seqs[i]
         for i in np.random.choice(
             np.array(range(len(background_seqs))),
-            size=min(100, len(background_seqs)),
+            size=min(n_subset, len(background_seqs)),
             replace=False,
         )
     ]
