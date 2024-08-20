@@ -92,6 +92,8 @@ def calculate_scores(
         for j in tqdm.tqdm(
             range(0, len(seqs_to_explain), batch_size), desc=desc, disable=silence
         ):
+            print(seqs_to_explain.shape)
+            print(j, batch_size)
             shap_values = explainer.shap_values(
                 seqs_to_explain[j : j + batch_size], check_additivity=check_additivity
             )
