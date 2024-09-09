@@ -102,7 +102,7 @@ def main():
     parser.add_argument(
         "--n_subset",
         type=int,
-        default=100,
+        default=20,
         help="Maximum number of sequences to use as background. \
             Default is 100 to ensure reasonably fast compute on large datasets.",
     )
