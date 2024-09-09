@@ -76,6 +76,12 @@ def main():
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
     parser.add_argument("score_fp", type=str, help="Where to write DFIM scores.")
     parser.add_argument(
+        "--model_fp",
+        type=str,
+        default=None,
+        help="Model file path. If None, will use all models in model_dir. Overwrites model_dir.",
+    )
+    parser.add_argument(
         "--model_dir",
         type=str,
         default="ensemble_models/",
@@ -150,7 +156,10 @@ def main():
     # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
-    model_fps = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
+    if args.model_fp is None:
+        model_fps = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
+    else:
+        model_fps = [args.model_fp]
     explainers = create_explainers(model_fps, twohot_background, contrib, args.silence)
 
     # Calculate DFIM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
