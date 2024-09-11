@@ -110,7 +110,7 @@ def main():
         type=int,
         default=20,
         help="Maximum number of sequences to use as background. \
-            Default is 100 to ensure reasonably fast compute on large datasets.",
+            Default is 20 to ensure reasonably fast compute on large datasets.",
     )
     parser.add_argument(
         "--gpu",
@@ -164,6 +164,8 @@ def main():
 
     # Calculate DFIM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    print("Calculating DFIM scores from pos {args.start} to {args.stop} in sequences of length {len(seqs_to_explain[0])}.")
+    
     dfims = {
         rec.name: calculate_dfim(
             explainers,
