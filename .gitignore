@@ -13,6 +13,7 @@ shap_requirements_old.txt
 shap_requirements_explicit.txt
 tf_requirements_explicit.txt
 ensemble_models/*.h5
+reference_models/*.h5
 batch_bridges2.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

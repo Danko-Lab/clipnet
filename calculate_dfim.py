@@ -171,9 +171,9 @@ def main():
             args.start,
             args.stop,
             check_additivity=not args.skip_check_additivity,
-            silence=args.silence,
+            silence=True,
         )
-        for rec in seqs_to_explain
+        for rec in tqdm.tqdm(seqs_to_explain, total=len(seqs_to_explain), disable=not args.silence)
     }
     np.savez(args.score_fp, **dfims)
 
