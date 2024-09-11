@@ -164,7 +164,7 @@ def main():
 
     # Calculate DFIM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    print("Calculating DFIM scores from pos {args.start} to {args.stop} in sequences of length {len(seqs_to_explain[0])}.")
+    print(f"Calculating DFIM scores from pos {args.start} to {args.stop} in sequences of length {len(seqs_to_explain[0])}.")
     
     dfims = {
         rec.name: calculate_dfim(
