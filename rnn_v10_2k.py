@@ -26,7 +26,7 @@ c1 = {"filters": 64, "kernel_size": 8}
 c2 = {"filters": 128, "kernel_size": 4}
 dropout = 0.3
 
-num_dilations = 11
+num_dilations = 12
 num_filters = 64
 dilation_kernel = 3
 
