@@ -48,7 +48,9 @@ def main():
     elif args.observed.endswith(".csv.gz") or args.observed.endswith(".csv"):
         observed = pd.read_csv(args.observed, header=None, index_col=0).to_numpy()
     else:
-        raise ValueError(f"File with observed PRO-cap data ({args.observed}) must be numpy or csv format.")
+        raise ValueError(
+            f"File with observed PRO-cap data ({args.observed}) must be numpy or csv format."
+        )
 
     # Validate dimensions
     if track.shape[0] != observed.shape[0]:
@@ -83,10 +85,17 @@ def main():
 
     # Benchmark TSS position
     strand_break = track.shape[1] // 2
-    pred_tss = np.concatenate(track[:, :strand_break].argmax(axis=1), track[:, strand_break:].argmax(axis=1))
-    obs_tss = np.concatenate(observed_clipped[:, :strand_break].argmax(axis=1), observed_clipped[:, strand_break:].argmax(axis=1))
+    pred_tss = np.concatenate(
+        [track[:, :strand_break].argmax(axis=1), track[:, strand_break:].argmax(axis=1)]
+    )
+    obs_tss = np.concatenate(
+        [
+            observed_clipped[:, :strand_break].argmax(axis=1),
+            observed_clipped[:, strand_break:].argmax(axis=1),
+        ]
+    )
     tss_pos_pearson = pearsonr(pred_tss, obs_tss)
-    
+
     # Benchmark profile
     track_pearson = pd.DataFrame(track).corrwith(pd.DataFrame(observed_clipped), axis=1)
     track_js_distance = jensenshannon(track, observed_clipped, axis=1)
@@ -126,9 +135,7 @@ def main():
             data=np.array(directionality_pearson),
             compression="gzip",
         )
-        hf.create_dataset(
-            "tss_pos_pearson", data=tss_pos_pearson, compression="gzip"
-        )
+        hf.create_dataset("tss_pos_pearson", data=tss_pos_pearson, compression="gzip")
         hf.create_dataset(
             "quantity_log_pearson",
             data=np.array(quantity_log_pearson),
