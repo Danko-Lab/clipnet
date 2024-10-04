@@ -1,4 +1,4 @@
-## Architecture of neural network currently in use for CLIPNET.
+## NOT CURRENTLY USED. FOR FUTURE DEVELOPMENT/TESTING ONLY.
 
 import tensorflow as tf
 from tensorflow.keras import layers
