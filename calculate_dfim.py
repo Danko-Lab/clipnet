@@ -164,8 +164,10 @@ def main():
 
     # Calculate DFIM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    print(f"Calculating DFIM scores from pos {args.start} to {args.stop} in sequences of length {len(seqs_to_explain[0])}.")
-    
+    print(
+        f"Calculating DFIM scores from pos {args.start} to {args.stop} in sequences of length {len(seqs_to_explain[0])}."
+    )
+
     dfims = {
         rec.name: calculate_dfim(
             explainers,
@@ -175,7 +177,12 @@ def main():
             check_additivity=not args.skip_check_additivity,
             silence=True,
         )
-        for rec in tqdm.tqdm(seqs_to_explain, total=len(seqs_to_explain), desc="Calculating DFIM", disable=args.silence)
+        for rec in tqdm.tqdm(
+            seqs_to_explain,
+            total=len(seqs_to_explain),
+            desc="Calculating DFIM",
+            disable=args.silence,
+        )
     }
     np.savez(args.score_fp, **dfims)
 
