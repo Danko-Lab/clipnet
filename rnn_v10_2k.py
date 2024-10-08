@@ -8,7 +8,7 @@ import custom_loss
 # model fitting hyperparameters
 epochs = 200
 patience = 10
-batch_size = 256
+batch_size = 128
 
 # compile parameters
 optimizer = tf.keras.optimizers.Adam
