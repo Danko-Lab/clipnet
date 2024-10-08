@@ -8,7 +8,7 @@ import custom_loss
 # model fitting hyperparameters
 epochs = 200
 patience = 10
-batch_size = 64
+batch_size = 256
 
 # compile parameters
 optimizer = tf.keras.optimizers.Adam
@@ -26,7 +26,7 @@ c1 = {"filters": 64, "kernel_size": 8}
 c2 = {"filters": 128, "kernel_size": 4}
 dropout = 0.3
 
-num_dilations = 8
+num_dilations = 9
 num_filters = 64
 dilation_kernel = 3
 
