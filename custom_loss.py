@@ -31,6 +31,13 @@ def corr(x, y, pseudocount=1e-6):
     return r
 
 
+def corr_log(x, y, pseudocount=1e-6):
+    """
+    Log transforms x and y before calculating corr.
+    """
+    return corr(tf.math.log(x + pseudocount), tf.math.log(y + pseudocount), pseudocount)
+
+
 def corr_loss(x, y, pseudocount=1e-6):
     """Computes -correlation(x, y)."""
     return -corr(x, y, pseudocount)
