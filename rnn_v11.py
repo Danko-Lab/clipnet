@@ -1,4 +1,4 @@
-## NOT CURRENTLY IMPLEMENTED. FOR FUTURE/TESTING USE ONLY.
+## Architecture of neural network currently in use for CLIPNET.
 
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -8,7 +8,7 @@ import custom_loss
 # model fitting hyperparameters
 epochs = 200
 patience = 10
-batch_size = 32
+batch_size = 256
 
 # compile parameters
 optimizer = tf.keras.optimizers.Adam
@@ -22,12 +22,11 @@ loss = {"shape": "CosineSimilarity", "sum": "msle"}
 metrics = {"shape": custom_loss.corr}
 
 # model architecture hyperparameters
-n_filters = 64
-c1_kernel_size = 21
-# dc_kernel_size = 75
-# dropout = 0.3
+c1 = {"filters": 64, "kernel_size": 8}
+c2 = {"filters": 128, "kernel_size": 4}
 
 num_dilations = 9
+num_filters = 64
 dilation_kernel = 3
 
 
@@ -42,47 +41,48 @@ def dilated_conv(x, filters, kernel_size, dilation_rate):
         padding="same",
         dilation_rate=dilation_rate,
     )(x)
-    # residual = layers.BatchNormalization()(residual)
+    residual = layers.BatchNormalization()(residual)
     residual = layers.Activation("relu")(residual)
     # Add skip connection
     out = layers.Add()([x, residual])
-    # out = layers.BatchNormalization()(out)
-    # out = layers.Activation("relu")(out)
+    out = layers.BatchNormalization()(out)
+    out = layers.Activation("relu")(out)
     return out
 
 
-def construct_nn(input_length, output_length):
+def construct_nn(input_length, output_length, dilation_kernel=dilation_kernel):
     """
     Returns a neural network with given input and output lengths.
     """
     # input
     X = layers.Input(shape=(input_length, 4))
-    # y = layers.BatchNormalization()(X)
+    y = layers.BatchNormalization()(X)
     # 1st convolutional layer
-    y = layers.Conv1D(filters=n_filters, kernel_size=c1_kernel_size)(X)
-    # y = layers.BatchNormalization()(y)
+    y = layers.Conv1D(filters=c1["filters"], kernel_size=c1["kernel_size"])(y)
+    y = layers.BatchNormalization()(y)
     y = layers.Activation("elu")(y)
-    # y = layers.MaxPooling1D(pool_size=(2))(y)
+    y = layers.MaxPooling1D(pool_size=(2))(y)
+    # 2nd convolutional layer
+    y = layers.Conv1D(filters=c2["filters"], kernel_size=c2["kernel_size"])(y)
+    y = layers.BatchNormalization()(y)
+    y = layers.Activation("relu")(y)
+    y = layers.MaxPooling1D(pool_size=(2))(y)
     # dilated convolutions
-    y = layers.Conv1D(filters=n_filters, kernel_size=1)(y)
+    y = layers.Conv1D(kernel_size=1, filters=num_filters)(y)
     for i in range(num_dilations):
         y = dilated_conv(
-            y, filters=n_filters, kernel_size=dilation_kernel, dilation_rate=2**i
+            y, filters=num_filters, kernel_size=dilation_kernel, dilation_rate=2**i
         )
-    # y = layers.MaxPooling1D(pool_size=(2))(y)
+    y = layers.MaxPooling1D(pool_size=(2))(y)
     # shape / probability distribution head
-    # p_head = layers.Conv1DTranspose(filters=n_filters, kernel_size=dc_kernel_size)(y)
     p_head = layers.Flatten()(y)
     p_head = layers.Dense(output_length)(p_head)
-    # p_head = layers.BatchNormalization()(p_head)
-    p_head = layers.Activation("relu", name="shape")(p_head)
-    # p_head = layers.Dropout(dropout, name="shape")(p_head)
+    p_head = layers.BatchNormalization()(p_head)
+    p_head = layers.Activation("relu", name="profile")(p_head)
     # sum head
     s_head = layers.GlobalAvgPool1D()(y)
-    s_head = layers.Flatten()(s_head)
     s_head = layers.Dense(1)(s_head)
-    # s_head = layers.BatchNormalization()(s_head)
-    s_head = layers.Activation("relu", name="sum")(s_head)
-    # s_head = layers.Dropout(dropout, name="sum")(s_head)
+    s_head = layers.BatchNormalization()(s_head)
+    s_head = layers.Activation("relu", name="quantity")(s_head)
     # output model
     return tf.keras.models.Model(X, [p_head, s_head])
