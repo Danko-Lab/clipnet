@@ -18,8 +18,8 @@ opt_hyperparameters = {
     "beta_2": 0.999,
     "epsilon": 1e-7,
 }
-loss = {"profile": "CosineSimilarity", "quantity": "msle"}
-metrics = {"profile": custom_loss.corr}
+loss = {"shape": "CosineSimilarity", "sum": "msle"}
+metrics = {"shape": custom_loss.corr}
 
 # model architecture hyperparameters
 c1 = {"filters": 64, "kernel_size": 8}
@@ -78,11 +78,11 @@ def construct_nn(input_length, output_length, dilation_kernel=dilation_kernel):
     p_head = layers.Flatten()(y)
     p_head = layers.Dense(output_length)(p_head)
     p_head = layers.BatchNormalization()(p_head)
-    p_head = layers.Activation("relu", name="profile")(p_head)
+    p_head = layers.Activation("relu", name="shape")(p_head)
     # sum head
     s_head = layers.GlobalAvgPool1D()(y)
     s_head = layers.Dense(1)(s_head)
     s_head = layers.BatchNormalization()(s_head)
-    s_head = layers.Activation("relu", name="quantity")(s_head)
+    s_head = layers.Activation("relu", name="sum")(s_head)
     # output model
     return tf.keras.models.Model(X, [p_head, s_head])
