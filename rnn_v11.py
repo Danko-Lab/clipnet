@@ -1,4 +1,4 @@
-## Architecture of neural network currently in use for CLIPNET.
+## NOT CURRENTLY USED. FOR FUTURE DEVELOPMENT/TESTING ONLY.
 
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -78,7 +78,9 @@ def construct_nn(input_length, output_length, dilation_kernel=dilation_kernel):
     p_head = layers.Flatten()(y)
     p_head = layers.Dense(output_length)(p_head)
     p_head = layers.BatchNormalization()(p_head)
-    p_head = layers.Activation("relu", name="profile")(p_head)
+    p_head = layers.Activation(
+        "relu",
+    )(p_head)
     # sum head
     s_head = layers.GlobalAvgPool1D()(y)
     s_head = layers.Dense(1)(s_head)
