@@ -43,7 +43,9 @@ def profile_contrib(model):
     return contrib
 
 
-def load_seqs(fasta_fp, return_twohot_explains=True, background_fp=None, n_subset=100, seed=None):
+def load_seqs(
+    fasta_fp, return_twohot_explains=True, background_fp=None, n_subset=100, seed=None
+):
     np.random.seed(seed)
     seqs_to_explain = pyfastx.Fasta(fasta_fp)
     background_seqs = (
@@ -52,9 +54,7 @@ def load_seqs(fasta_fp, return_twohot_explains=True, background_fp=None, n_subse
     reference = [
         background_seqs[i]
         for i in np.random.choice(
-            np.array(range(len(background_seqs))),
-            size=min(n_subset, len(background_seqs)),
-            replace=False,
+            np.array(range(len(background_seqs))), size=n_subset, replace=True
         )
     ]
     shuffled_reference = [
@@ -196,7 +196,8 @@ def main():
 
     # Create explainers ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
+    if args.gpu is not None:
+        nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
 
     if args.model_fp is not None:
         model_fps = [args.model_fp]
