@@ -41,7 +41,7 @@ CLIPNET was trained on a [population-scale PRO-cap dataset](http://dx.doi.org/10
 
 CLIPNET can either work on haploid reference sequences (e.g. hg38) or on individualized sequences (e.g. 1kGP). When constructing individualized sequences, we made two major simplifications: (1) We considered only SNPs and (2) we used unphased SNP genotypes.
 
-We encode sequences using a "two-hot" encoding. That is, we encoded each individual nucleotide at a given position using a one-hot encoding scheme, then represented the unphased diploid sequence as the sum of the two one-hot encoded nucleotides at each position. The sequence "AYCR", for example, would be encoded as: `[[2, 0, 0, 0], [0, 1, 0, 1], [0, 2, 0, 0], [1, 0, 1, 0]]`.
+We encode sequences using a "two-hot" encoding. That is, we encoded each individual nucleotide at a given position using a one-hot encoding scheme, then represented the unphased diploid sequence as the sum of the two one-hot encoded nucleotides at each position. The sequence "AYCR" (= A(C/T)C(A/G)), for example, would be encoded as: `[[2, 0, 0, 0], [0, 1, 0, 1], [0, 2, 0, 0], [1, 0, 1, 0]]`.
 
 ### Command line interface
 
