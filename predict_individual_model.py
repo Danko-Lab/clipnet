@@ -59,7 +59,7 @@ def main():
         low_mem=True,
         silence=args.silence,
     )
-    if len(prediction) == 1:
+    if args.outputs == 1:
         np.savez_compressed(args.output_fp, prediction)
     else:
         np.savez_compressed(args.output_fp, *prediction)

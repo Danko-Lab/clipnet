@@ -69,7 +69,7 @@ def main():
         low_mem=True,
         silence=args.silence,
     )
-    if len(ensemble_predictions) == 1:
+    if args.outputs == 1:
         np.savez_compressed(args.output_fp, ensemble_predictions)
     else:
         np.savez_compressed(args.output_fp, *ensemble_predictions)
