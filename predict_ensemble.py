@@ -8,7 +8,7 @@ import argparse
 import logging
 import os
 
-import h5py
+import numpy as np
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
@@ -29,6 +29,14 @@ def main():
         type=str,
         default="ensemble_models/",
         help="Directory to load models from",
+    )
+    parser.add_argument(
+        "--outputs",
+        type=int,
+        default=2,
+        choices=[1, 2],
+        help="Number of outputs for the model. Default is 2 for standard CLIPNET models "
+        "and 1 for the single scalar output models (e.g. PauseNet, OrientNet).",
     )
     parser.add_argument(
         "--reverse_complement",
@@ -56,13 +64,15 @@ def main():
     ensemble_predictions = nn.predict_on_fasta(
         model_fp=args.model_dir,
         fasta_fp=args.fasta_fp,
+        outputs=args.outputs,
         reverse_complement=args.reverse_complement,
         low_mem=True,
         silence=args.silence,
     )
-    with h5py.File(args.output_fp, "w") as hf:
-        hf.create_dataset("track", data=ensemble_predictions[0], compression="gzip")
-        hf.create_dataset("quantity", data=ensemble_predictions[1], compression="gzip")
+    if len(ensemble_predictions) == 1:
+        np.savez_compressed(args.output_fp, ensemble_predictions)
+    else:
+        np.savez_compressed(args.output_fp, *ensemble_predictions)
 
 
 if __name__ == "__main__":

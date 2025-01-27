@@ -1,5 +1,5 @@
 """
-This file contains the CLIPNET class, which contains most of the main functions used to 
+This file contains the CLIPNET class, which contains most of the main functions used to
 it, predict, and interpret the convolutional neural networks used in the CLIPNET project.
 """
 
@@ -251,7 +251,9 @@ class CLIPNET:
     # Construct model ensemble.
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def construct_ensemble(self, model_dir="./ensemble_models", silence=False):
+    def construct_ensemble(
+        self, model_dir="./ensemble_models", outputs=2, silence=False
+    ):
         """
         Constructs an ensemble of models. Model ensembling is done by averaging the
         tracks and quantities of each model in the ensemble.
@@ -265,12 +267,19 @@ class CLIPNET:
         for i in range(len(models)):
             models[i]._name = f"model_{i}"
         inputs = models[0].input
-        tracks = [models[i](inputs)[0] for i in range(len(models))]
-        quantities = [models[i](inputs)[1] for i in range(len(models))]
-        outputs = [
-            tf.keras.layers.Average()(tracks),
-            tf.keras.layers.Average()(quantities),
-        ]
+        if outputs == 2:
+            tracks = [models[i](inputs)[0] for i in range(len(models))]
+            quantities = [models[i](inputs)[1] for i in range(len(models))]
+            outputs = [
+                tf.keras.layers.Average()(tracks),
+                tf.keras.layers.Average()(quantities),
+            ]
+        elif outputs == 1:
+            outputs = tf.keras.layers.Average()(
+                [models[i](inputs) for i in range(len(models))]
+            )
+        else:
+            raise ValueError(f"Invalid number of outputs: {outputs}. Must be 1 or 2.")
         ensemble = tf.keras.models.Model(inputs=inputs, outputs=outputs)
         return ensemble
 
@@ -282,6 +291,7 @@ class CLIPNET:
         self,
         model_fp,
         fasta_fp,
+        outputs=2,
         reverse_complement=False,
         low_mem=True,
         desc="Predicting",
@@ -299,7 +309,7 @@ class CLIPNET:
             sequence = utils.get_twohot_fasta_sequences(fasta_fp, silence=silence)
         X = utils.rc_twohot_het(sequence) if reverse_complement else sequence
         if os.path.isdir(model_fp):
-            model = self.construct_ensemble(model_fp, silence=silence)
+            model = self.construct_ensemble(model_fp, outputs=outputs, silence=silence)
         else:
             model = tf.keras.models.load_model(model_fp, compile=False)
         if low_mem and self.nn.batch_size < X.shape[0]:
@@ -314,10 +324,17 @@ class CLIPNET:
                     disable=silence,
                 )
             ]
-            y_predict = [
-                np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
-                np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
-            ]
+            if outputs == 2:
+                y_predict = [
+                    np.concatenate([chunk[0] for chunk in y_predict_handle], axis=0),
+                    np.concatenate([chunk[1] for chunk in y_predict_handle], axis=0),
+                ]
+            elif outputs == 1:
+                y_predict = np.concatenate(y_predict_handle, axis=0)
+            else:
+                raise ValueError(
+                    f"Invalid number of outputs: {outputs}. Must be 1 or 2."
+                )
         else:
             y_predict = model.predict(X, batch_size=self.nn.batch_size, verbose=1)
         return y_predict
