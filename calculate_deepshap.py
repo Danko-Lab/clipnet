@@ -119,7 +119,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("fasta_fp", type=str, help="Fasta file path.")
     parser.add_argument("score_fp", type=str, help="Where to write DeepSHAP scores.")
-    parser.add_argument("seq_fp", type=str, help="Where to write onehot sequences.")
+    parser.add_argument(
+        "--seq_fp", type=str, default=None, help="Where to write onehot sequences."
+    )
     parser.add_argument(
         "--model_dir",
         type=str,
@@ -222,7 +224,10 @@ def main():
     # Save DeepSHAP scores
     np.savez_compressed(args.score_fp, explanations.swapaxes(1, 2))
     # Convert twohot to onehot and save
-    np.savez_compressed(args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2))
+    if args.seq_fp is not None:
+        np.savez_compressed(
+            args.seq_fp, (seqs_to_explain / 2).astype(int).swapaxes(1, 2)
+        )
     # Save hypothetical attributions
     if args.hyp_attr_fp is not None:
         np.savez_compressed(args.hyp_attr_fp, mean_explanations.swapaxes(1, 2))
