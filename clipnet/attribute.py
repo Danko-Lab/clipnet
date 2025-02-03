@@ -6,21 +6,19 @@ Functions for calculating attribution scores using shap.DeepExplainer
 """
 
 import gc
-import logging
-import os
 
 import numpy as np
 import pyfastx
-import shap
 import tqdm
+from silence_tensorflow import silence_tensorflow
 
-from . import utils
+from . import shuffle, utils
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
-logging.getLogger("tensorflow").setLevel(logging.FATAL)
+silence_tensorflow()
+import shap
 import tensorflow as tf
 
-# This will fix an error message for running tf.__version__==2.5
+# This may be needed to fix certain version incompatibilities
 shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
     shap.explainers._deep.deep_tf.passthrough
 )
@@ -76,7 +74,7 @@ def load_seqs(
         )
     ]
     shuffled_reference = [
-        utils.kshuffle(rec.seq, random_seed=seed)[0] for rec in reference
+        shuffle.kshuffle(rec.seq, random_seed=seed)[0] for rec in reference
     ]
     twohot_background = np.array(
         [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
@@ -88,9 +86,7 @@ def load_seqs(
     return seqs_to_explain, twohot_background
 
 
-def create_explainers(
-    model_fps, twohot_background, contrib=quantity_contrib, silence=False
-):
+def create_explainers(model_fps, twohot_background, contrib, silence=False):
     models = [
         tf.keras.models.load_model(fp, compile=False)
         for fp in tqdm.tqdm(model_fps, desc="Loading models")

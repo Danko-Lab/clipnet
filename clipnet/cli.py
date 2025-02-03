@@ -7,25 +7,27 @@ Wrapper script to calculate attributions and predictions for CLIPNET models
 
 import argparse
 import glob
-import logging
 import os
 
 import numpy as np
+import tqdm
+from silence_tensorflow import silence_tensorflow
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
-logging.getLogger("tensorflow").setLevel(logging.FATAL)
-
+silence_tensorflow()
 import tensorflow as tf
 
-from . import attribute, clipnet
+from . import attribute, clipnet, epistasis
 
 _help = """
 The following commands are available:
     predict         Calculate predictions for a CLIPNET model
     attribute       Calculate DeepLIFT/SHAP attributions for a CLIPNET model
-The following commands are planned but are
-    ism_shuffle     Calculate ISM shuffle scores for a CLIPNET model
     epistasis       Calculate Deep Feature Interaction Maps for a CLIPNET model
+The following commands are planned but are not yet implemented.
+    ism_shuffle     Calculate ISM shuffle scores for a CLIPNET model
+    tss
+    activation_maps
+    fit
 """
 
 
@@ -35,19 +37,17 @@ def cli():
     parser_parent = argparse.ArgumentParser(add_help=False)
     parser_parent.add_argument(
         "-f",
-        "--fa_fp",
+        "--fasta_fp",
         type=str,
         required=True,
-        help="Path to uncompressed fasta file. Can be either a full genome "
-        "(in which case a bed file of regions must be provided) or a preprocessed "
-        "file of sequences of length 1000.",
+        help="Path to fasta file containing preprocessed sequences of length 1000.",
     )
     parser_parent.add_argument(
         "-o",
         "--output_fp",
         type=str,
         required=True,
-        help="Path to save the main output file. Generally should be a .npz file.",
+        help="Path (.npz) to save the main output file.",
     )
     parser_parent.add_argument(
         "-m",
@@ -59,15 +59,6 @@ def cli():
         "average across all models in the directory.",
     )
     parser_parent.add_argument(
-        "-b",
-        "--bed_fp",
-        type=str,
-        default=None,
-        help="Path to bed file of regions to calculate predictions/attributions for. "
-        "If not provided, will assume that fa_fname contains preprocessed sequences of "
-        "length 1000.",
-    )
-    parser_parent.add_argument(
         "-n",
         "--n_outputs",
         type=int,
@@ -76,16 +67,7 @@ def cli():
         "and 1 for the single scalar output models (e.g. PauseNet, OrientNet, InitNet).",
     )
     parser_parent.add_argument(
-        "-c",
-        "--chroms",
-        type=str,
-        nargs="+",
-        default=None,
-        help="Chromosomes to calculate predictions or attributions for. Defaults to all. "
-        "Only used if bed_fname is provided, as we can use those to filter chroms.",
-    )
-    parser_parent.add_argument(
-        "-bs",
+        "-b",
         "--batch_size",
         type=int,
         default=16,
@@ -96,7 +78,7 @@ def cli():
         "--gpu",
         type=int,
         default=0,
-        help="Which GPU to use. If -1, uses CPU.",
+        help="Which GPU to use (default is 0, the first one). If -1, uses CPU.",
     )
     parser_parent.add_argument(
         "-v", "--verbose", action="store_true", help="Whether to print progress bars."
@@ -116,16 +98,6 @@ def cli():
         help="Calculate predictions for a given set of regions.",
         parents=[parser_parent],
     )
-    parser_predict.add_argument(
-        "-s",
-        "--signal_fname",
-        type=str,
-        nargs=2,
-        default=None,
-        help="Signal files containing experimental data to benchmark model "
-        "predictions against. Expected order is [plus_bigWig, minus_bigWig]. "
-        "If not provided, will not calculate performance metrics.",
-    )
 
     # ATTRIBUTE PARAMS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -135,12 +107,13 @@ def cli():
         parents=[parser_parent],
     )
     parser_attribute.add_argument(
-        "-m",
-        "--mode",
+        "-a",
+        "--attribution_type",
         type=str,
         default="quantity",
         choices={"quantity", "profile"},
-        help="The type of attribution to calculate.",
+        help="The type of attribution to calculate. REQUIRED if n_outputs == 2. "
+        "if n_outputs == 1, this does nothing",
     )
     parser_attribute.add_argument(
         "-s",
@@ -157,18 +130,25 @@ def cli():
         help="Where to save hypothetical attributions. Defaults to not saving.",
     )
     parser_attribute.add_argument(
-        "-n",
-        "--n_shuffles",
+        "-d",
+        "--n_dinucleotide_shuffles",
         type=int,
         default=100,
-        help="Number of dinucleotide shuffles for DeepLIFT/SHAP. Defaults to 100.",
+        help="Number of dinucleotide shuffles for DeepLIFT/SHAP background reference. "
+        "Defaults to 100.",
     )
     parser_attribute.add_argument(
         "-r",
         "--random_state",
         type=int,
-        default=47,
-        help="Random seed. Defaults to 47.",
+        default=None,
+        help="Seed for random state. Defaults to None.",
+    )
+    parser_attribute.add_argument(
+        "-c",
+        "--skip_check_additivity",
+        action="store_true",
+        help="Skip check for additivity of attributions.",
     )
 
     # ISM SHUFFLE PARAMS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +166,35 @@ def cli():
         help="Calculate Deep Feature Interaction Maps for a given set of regions.",
         parents=[parser_parent],
     )
-
+    parser_epistasis.add_argument(
+        "-a",
+        "--attribution_type",
+        type=str,
+        default="quantity",
+        choices={"quantity", "profile"},
+        help="The type of attribution to calculate. REQUIRED if n_outputs == 2. "
+        "if n_outputs == 1, this does nothing",
+    )
+    parser_epistasis.add_argument(
+        "-s", "--start", type=int, default=250, help="Start position for DFIM."
+    )
+    parser_epistasis.add_argument(
+        "-e", "--end", type=int, default=750, help="End position for DFIM."
+    )
+    parser.add_argument(
+        "-d",
+        "--n_dinucleotide_shuffles",
+        type=int,
+        default=20,
+        help="Maximum number of sequences to use as background. "
+        "Default is 20 to ensure reasonably fast compute on large datasets.",
+    )
+    parser.add_argument(
+        "-c",
+        "--skip_check_additivity",
+        action="store_true",
+        help="Disables check for additivity of shap results.",
+    )
     args = parser.parse_args()
 
     # MAIN CODE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -205,11 +213,10 @@ def cli():
             model_fp=args.model_fp,
             fasta_fp=args.fasta_fp,
             outputs=args.n_outputs,
-            reverse_complement=args.reverse_complement,
             low_mem=True,
             silence=not args.verbose,
         )
-        if args.outputs == 1:
+        if args.n_outputs == 1:
             np.savez_compressed(args.output_fp, ensemble_predictions)
         else:
             np.savez_compressed(args.output_fp, *ensemble_predictions)
@@ -222,15 +229,17 @@ def cli():
 
         # Load data
         seqs_to_explain, twohot_background = attribute.load_seqs(
-            args.fasta_fp, n_subset=args.n_subset, seed=args.seed
+            fast_fp=args.fasta_fp,
+            n_subset=args.n_dinucleotide_shuffles,
+            seed=args.random_state,
         )
 
         # Define contribution function
         if args.n_outputs == 1:
             contrib = attribute.scalar_contrib
-        if args.mode == "quantity":
+        if args.attribution_type == "quantity":
             contrib = attribute.quantity_contrib
-        elif args.mode == "profile":
+        elif args.attribution_type == "profile":
             contrib = attribute.profile_contrib
 
         # Create explainers
@@ -239,10 +248,10 @@ def cli():
         else:
             model_names = [args.model_fp]
         explainers = attribute.create_explainers(
-            model_names,
-            twohot_background,
-            contrib,
-            len(model_names) == 1 or args.silence,
+            model_fps=model_names,
+            twohot_background=twohot_background,
+            contrib=contrib,
+            silence=len(model_names) == 1 or not args.verbose,
         )
 
         # Convert twohot to onehot and save
@@ -253,27 +262,77 @@ def cli():
 
         # Calculate attributions
         explanations, hyp_explanations = attribute.calculate_scores(
-            explainers,
-            seqs_to_explain,
+            explainers=explainers,
+            seqs_to_explain=seqs_to_explain,
             batch_size=args.batch_size,
-            silence=args.silence,
+            silence=not args.verbose,
             check_additivity=not args.skip_check_additivity,
         )
 
         # Save
-        np.savez_compressed(args.score_fp, explanations.swapaxes(1, 2))
+        np.savez_compressed(args.output_fp, explanations.swapaxes(1, 2))
         # Save hypothetical attributions
         if args.hyp_attr_fp is not None:
             np.savez_compressed(args.hyp_attr_fp, hyp_explanations.swapaxes(1, 2))
 
-    # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    elif args.cmd == "ism_shuffle":
-        pass
-
     # EPISTASIS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     elif args.cmd == "epistasis":
+        # Load sequences as strings
+        seqs_to_explain, twohot_background = attribute.load_seqs(
+            fast_fp=args.fasta_fp,
+            return_twohot_explains=False,
+            background_fp=None,
+            n_subset=args.n_dinucleotide_shuffles,
+            seed=args.random_state,
+        )
+
+        # Define contribution function
+        if args.n_outputs == 1:
+            contrib = attribute.scalar_contrib
+        if args.attribution_type == "quantity":
+            contrib = attribute.quantity_contrib
+        elif args.attribution_type == "profile":
+            contrib = attribute.profile_contrib
+
+        # Create explainers
+        if os.path.isdir(args.model_fp):
+            model_names = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
+        else:
+            model_names = [args.model_fp]
+        explainers = attribute.create_explainers(
+            model_fps=model_names,
+            twohot_background=twohot_background,
+            contrib=contrib,
+            silence=len(model_names) == 1 or not args.verbose,
+        )
+
+        # Calculate DFIM
+        dfims = np.stack(
+            [
+                epistasis.dfim(
+                    explainers=explainers,
+                    major_seq=rec.seq,
+                    start=args.start,
+                    stop=args.stop,
+                    check_additivity=not args.skip_check_additivity,
+                    silence=True,
+                )
+                for rec in tqdm.tqdm(
+                    seqs_to_explain,
+                    total=len(seqs_to_explain),
+                    desc="Calculating DFIM",
+                    disable=not args.verbose,
+                )
+            ]
+        )
+
+        # Save
+        np.savez(args.output_fp, dfims)
+
+    # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    elif args.cmd == "ism_shuffle":
         pass
 
     # INVALID ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
