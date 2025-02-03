@@ -69,8 +69,6 @@ def dfim(explainers, major_seq, start, stop, check_additivity=True, silence=Fals
                 for explainer in explainers
             ]
         ).mean(axis=0)
-        fis = get_most_extreme(
-            major_shap * major_twohot / 2 - mut_shap * mut_twohot / 2, axis=0
-        )
+        fis = major_shap * major_twohot / 2 - mut_shap * mut_twohot / 2
         dfim.append(fis)
     return np.array(dfim)

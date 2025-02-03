@@ -23,14 +23,9 @@ shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
     shap.explainers._deep.deep_tf.passthrough
 )
 tf.compat.v1.disable_v2_behavior()
-
-
-def scalar_contrib(model):
-    return model.output
-
-
-def quantity_contrib(model):
-    return model.output[1]
+shap.explainers._deep.deep_tf.op_handlers["_profile_logit_scaling"] = (
+    shap.explainers._deep.deep_tf.nonlinearity_1d(0)
+)
 
 
 def profile_contrib_(model):
@@ -47,21 +42,48 @@ def profile_contrib_(model):
     return contrib
 
 
+def _profile_logit_scaling(logits):
+    """
+    Helper function to allow this operation to be registered by shap.DeepExplainer.
+    """
+    softmax = tf.keras.layers.Softmax()
+    return softmax(logits) * logits
+
+
 def profile_contrib(model):
     """
     Adapted from bpnetlite.bpnet.ProfileWrapper
     """
-    softmax = tf.keras.layers.Softmax()
-    avg = tf.keras.layers.Average(axis=-1, keepdims=True)
-    add = tf.keras.layers.Add(axis=-1, keepdims=True)
-    logits = model.output[0] - avg(model.output[0])
-    contrib = add(softmax(model.output[0]) * logits)
+    logits = model.output[0] - tf.reduce_mean(model.output[0], axis=-1, keepdims=True)
+    contrib = tf.reduce_sum(_profile_logit_scaling(logits), axis=-1, keepdims=True)
     return contrib
+
+
+def quantity_contrib(model):
+    """
+    Wraps model output for quantity attribution.
+    """
+    return model.output[1]
+
+
+def scalar_contrib(model):
+    """
+    Wraps scalar model output for consistency with oether model types.
+    """
+    return model.output
 
 
 def load_seqs(
     fasta_fp, return_twohot_explains=True, background_fp=None, n_subset=100, seed=None
 ):
+    """
+    Handles loading sequences for DeepLIFT/SHAP attribution.
+
+    Parameters
+
+    Returns
+
+    """
     np.random.seed(seed)
     seqs_to_explain = pyfastx.Fasta(fasta_fp)
     background_seqs = (
@@ -87,6 +109,14 @@ def load_seqs(
 
 
 def create_explainers(model_fps, twohot_background, contrib, silence=False):
+    """
+    Convenient wrapper function for creating shap.DeepExplainer objects.
+
+    Parameters
+
+    Returns
+
+    """
     models = [
         tf.keras.models.load_model(fp, compile=False)
         for fp in tqdm.tqdm(model_fps, desc="Loading models")
@@ -102,6 +132,14 @@ def create_explainers(model_fps, twohot_background, contrib, silence=False):
 def calculate_scores(
     explainers, seqs_to_explain, batch_size=256, check_additivity=True, silence=False
 ):
+    """
+    Calculates attribution scores in a VRAM-efficient manner.
+
+    Parameters
+
+    Returns
+
+    """
     hyp_explanations = {i: [] for i in range(len(explainers))}
     for i, explainer in enumerate(explainers):
         desc = "Calculating explanations"

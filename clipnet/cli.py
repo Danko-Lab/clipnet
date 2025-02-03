@@ -2,7 +2,7 @@
 # Adam He <adamyhe@gmail.com>
 
 """
-Wrapper script to calculate attributions and predictions for CLIPNET models
+CLI for calculating attributions and predictions with CLIPNET models.
 """
 
 import argparse
@@ -10,7 +10,6 @@ import glob
 import os
 
 import numpy as np
-import tqdm
 from silence_tensorflow import silence_tensorflow
 
 silence_tensorflow()
@@ -222,7 +221,7 @@ def cli():
 
         # Load data
         seqs_to_explain, twohot_background = attribute.load_seqs(
-            fast_fp=args.fasta_fp, n_subset=args.n_dinucleotide_shuffles
+            fasta_fp=args.fasta_fp, n_subset=args.n_dinucleotide_shuffles
         )
 
         # Define contribution function
@@ -235,7 +234,7 @@ def cli():
 
         # Create explainers
         if os.path.isdir(args.model_fp):
-            model_names = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
+            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
         else:
             model_names = [args.model_fp]
         explainers = attribute.create_explainers(
@@ -271,9 +270,8 @@ def cli():
     elif args.cmd == "epistasis":
         # Load sequences as strings
         seqs_to_explain, twohot_background = attribute.load_seqs(
-            fast_fp=args.fasta_fp,
+            fasta_fp=args.fasta_fp,
             return_twohot_explains=False,
-            background_fp=None,
             n_subset=args.n_dinucleotide_shuffles,
         )
 
@@ -287,7 +285,7 @@ def cli():
 
         # Create explainers
         if os.path.isdir(args.model_fp):
-            model_names = list(glob.glob(os.path.join(args.model_dir, "*.h5")))
+            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
         else:
             model_names = [args.model_fp]
         explainers = attribute.create_explainers(
@@ -304,16 +302,11 @@ def cli():
                     explainers=explainers,
                     major_seq=rec.seq,
                     start=args.start,
-                    stop=args.stop,
+                    stop=args.end,
                     check_additivity=not args.skip_check_additivity,
-                    silence=True,
+                    silence=not args.verbose,
                 )
-                for rec in tqdm.tqdm(
-                    seqs_to_explain,
-                    total=len(seqs_to_explain),
-                    desc="Calculating DFIM",
-                    disable=not args.verbose,
-                )
+                for rec in seqs_to_explain
             ]
         )
 
