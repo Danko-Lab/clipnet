@@ -27,6 +27,10 @@ shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
 tf.compat.v1.disable_v2_behavior()
 
 
+def scalar_contrib(model):
+    return model.output
+
+
 def quantity_contrib(model):
     return model.output[1]
 

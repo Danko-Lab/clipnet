@@ -13,7 +13,6 @@ import numpy as np
 import pyfastx
 import shap
 import tqdm
-
 import utils
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
@@ -161,6 +160,7 @@ def main():
         "--mode",
         type=str,
         default="quantity",
+        choices=["quantity", "profile"],
         help="Calculate contrib scores for quantity or profile.",
     )
     parser.add_argument(
@@ -168,6 +168,12 @@ def main():
         type=int,
         default=None,
         help="Index of GPU to use (starting from 0). If not invoked, uses CPU.",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=256,
+        help="Batch size for explaining sequences. Default is 256.",
     )
     parser.add_argument(
         "--n_subset",
@@ -230,7 +236,7 @@ def main():
     explanations, mean_explanations = calculate_scores(
         explainers,
         seqs_to_explain,
-        batch_size=256,
+        batch_size=args.batch_size,
         silence=args.silence,
         check_additivity=not args.skip_check_additivity,
     )

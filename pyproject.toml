@@ -45,4 +45,4 @@ packages = ["clipnet"]
 clipnet = "clipnet.cli:cli"
 
 [tool.setuptools.package-data]
-clipnet = ["data/myc_prom_tata_hg38.bed", "data/myc_prom_tata_hg38.fa"]
+clipnet = ["data/data_fold_assignments.csv", "data/test.fa"]
