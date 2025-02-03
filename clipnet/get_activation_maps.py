@@ -8,11 +8,11 @@ import argparse
 import logging
 import os
 
-import pandas as pd
+import joblib
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
-import clipnet
+from . import clipnet
 
 
 def main():
@@ -25,9 +25,14 @@ def main():
         help="If pyfastx throws an error, try deleting .fxi index files.",
     )
     parser.add_argument(
+        "predicted_tss_fp",
+        type=str,
+        help="Where to load predicted TSS positions from.",
+    )
+    parser.add_argument(
         "output",
         type=str,
-        help="where should the output be written? Will export a csv(.gz) file.",
+        help="where should the output be written? Will export a joblib.gz file.",
     )
     parser.add_argument(
         "--conv_layer",
@@ -36,28 +41,22 @@ def main():
         help="Which conv layer to get activations for",
     )
     parser.add_argument(
-        "--filter_width",
+        "--window",
         type=int,
-        default=15,
-        help="how wide is the width of each filter in this layer?",
-    )
-    parser.add_argument(
-        "--n",
-        type=int,
-        default=5000,
-        help="what is the number of top activating subsequences should we use to calculate GC content?",
+        default=200,
+        help="how wide of a window around tss to select.",
     )
     args = parser.parse_args()
 
     nn = clipnet.CLIPNET(n_gpus=0)
-    gc_content = nn.get_filter_gc_content(
+    activations = nn.get_activation_maps(
         args.model_fp,
         args.fasta_fp,
+        args.predicted_tss_fp,
         layer=args.conv_layer,
-        filter_width=args.filter_width,
-        n=args.n,
+        window=args.window,
     )
-    pd.Series(gc_content).to_csv(args.output, index=False)
+    joblib.dump(activations, args.output)
 
 
 if __name__ == "__main__":

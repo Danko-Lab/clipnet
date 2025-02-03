@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipnet"
+version = "0.0.0"
+description = """
+CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an 
+ensembled convolutional neural network that predicts transcription
+initiation from DNA sequence at single nucleotide resolution. This package
+contains code for training, predicting, and interpreting CLIPNET models.
+"""
+authors = [{ name = "Adam He", email = "adamyhe@gmail.com" }]
+license = { file = "LICENSE" }
+urls = { homepage = "https://github.com/adamyhe/clipnet" }
+requires-python = ">= 3.9"
+dependencies = [
+    "gputil",
+    "h5py",
+    "joblib>=1.3",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "pyfastx>=1.1",
+    "scipy",
+    "seqlogo",
+    "shap==0.44.1",
+    "tensorflow==2.14.0",
+    "tqdm==4.64.1",
+]
+
+#biopython
+#cmake
+#cython
+#ghostscript
+#pyarrow
+#pysam~=0.21.0
+
+
+[tool.setuptools]
+packages = ["clipnet"]
+
+[project.scripts]
+clipnet = "clipnet.cli:cli"
+
+[tool.setuptools.package-data]
+clipnet = ["data/myc_prom_tata_hg38.bed", "data/myc_prom_tata_hg38.fa"]

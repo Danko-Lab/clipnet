@@ -33,13 +33,29 @@ def quantity_contrib(model):
     return model.output[1]
 
 
-def profile_contrib(model):
+def profile_contrib_(model):
+    """
+    Original implementation used in CLIPNET. Deprecated, but kept here
+    for documentation.
+    """
     softmax = tf.keras.layers.Softmax()
     contrib = tf.reduce_mean(
         tf.stop_gradient(softmax(model.output[0])) * model.output[0],
         axis=-1,
         keepdims=True,
     )
+    return contrib
+
+
+def profile_contrib(model):
+    """
+    Adapted from bpnetlite.bpnet.ProfileWrapper
+    """
+    softmax = tf.keras.layers.Softmax()
+    avg = tf.keras.layers.Average(axis=-1, keepdims=True)
+    add = tf.keras.layers.Add(axis=-1, keepdims=True)
+    logits = model.output[0] - avg(model.output[0])
+    contrib = add(softmax(model.output[0]) * logits)
     return contrib
 
 

@@ -1,9 +1,12 @@
+# rnn_v10_exp.py
+# Adam He <adamyhe@gmail.com>
+
 ## NOT CURRENTLY USED. FOR FUTURE DEVELOPMENT/TESTING ONLY.
 
 import tensorflow as tf
 from tensorflow.keras import layers
 
-import custom_loss
+from . import custom_loss
 
 # model fitting hyperparameters
 epochs = 200

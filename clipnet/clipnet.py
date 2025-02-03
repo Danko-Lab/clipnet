@@ -1,3 +1,6 @@
+# clipnet.py
+# Adam He <adamyhe@gmail.com>
+
 """
 This file contains the CLIPNET class, which contains most of the main functions used to
 it, predict, and interpret the convolutional neural networks used in the CLIPNET project.
@@ -14,8 +17,7 @@ from pathlib import Path
 import GPUtil
 import numpy as np
 
-import cgen
-import utils
+from . import utils
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
@@ -23,6 +25,8 @@ import tensorflow as tf
 import tqdm
 from tensorflow.keras.callbacks import CSVLogger
 from tqdm.keras import TqdmCallback
+
+from . import cgen
 
 
 class TimeHistory(tf.keras.callbacks.Callback):
@@ -73,7 +77,9 @@ class CLIPNET:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def __gpu_settings(self):
-        if self.n_gpus == 0:
+        if self.use_specific_gpu < 0:
+            self.n_gpus = 0
+        if self.n_gpus <= 0:
             print("Requested 0 GPUs. Turning off GPUs.")
             tf.config.set_visible_devices([], "GPU")
             self.strategy = tf.distribute.get_strategy()

@@ -1,3 +1,6 @@
+# utils.py
+# Adam He <adamyhe@gmail.com>
+
 """
 Important helper functions for CLIPNET (mostly data loading and plotting).
 """
@@ -9,6 +12,7 @@ import re
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import pyfastx
 import tqdm
 
@@ -85,7 +89,7 @@ def get_twohot(seq):
     return TwoHotDNA(seq).twohot
 
 
-def get_twohot_from_series(series, cores=8, desc="Twohot encoding", silence=False):
+def get_twohot_from_series(series, cores=8, silence=False):
     """Extracts just the twohot encoding from TwoHotDNA.
 
     Given a pandas series of sequences, returns an twohot-encoded array (n, len, 4)
@@ -107,9 +111,59 @@ def get_twohot_from_series(series, cores=8, desc="Twohot encoding", silence=Fals
     else:
         twohot_encoded = [
             get_twohot(seq)
-            for seq in tqdm.tqdm(series.to_list(), desc=desc, disable=silence)
+            for seq in tqdm.tqdm(
+                series.to_list(), desc="Twohot encoding", disable=silence
+            )
         ]
     return np.array(twohot_encoded)
+
+
+def extract_loci(
+    fasta_fname,
+    bed_fname,
+    chroms=None,
+    in_window=1000,
+    cores=8,
+    silence=False,
+):
+    """
+    Fetches sequences from a fasta file given a bed file. Returns a twohot encoded
+    array.
+
+    Parameters
+    ----------
+    fasta_fname : str
+        Path to fasta file
+    bed_fname : str
+        Path to bed file
+    chroms : list, optional
+        List of chromosomes to extract, by default None
+    in_window : int, optional
+        Size of window to extract, by default 1000
+    cores : int, optional
+        Number of cores to use, by default 8
+    desc : str, optional
+        Description for tqdm, by default "Extracting loci"
+    silence : bool, optional
+        Whether to silence tqdm, by default False
+    """
+    fa = pyfastx.Fasta(fasta_fname)
+    loci = pd.read_csv(bed_fname, index_col=None, header=None, sep="\t")
+    if chroms is not None:
+        loci = loci[loci.iloc[:, 0].isin(chroms)]
+    centers = (loci.iloc[:, 1] + loci.iloc[:, 2]) // 2
+    windows = pd.DataFrame(
+        {
+            "chrom": loci.iloc[:, 0],
+            "start": centers - in_window // 2,
+            "end": centers + in_window // 2,
+        }
+    )
+    seqs = [
+        fa.fetch(windows.iloc[i, 0], (windows.iloc[i, 1], windows.iloc[i, 2]))
+        for i in tqdm.tqdm(range(len(windows)), desc="Extracting loci", disable=silence)
+    ]
+    return get_twohot_from_series(seqs, cores=cores, silence=silence)
 
 
 def gz_read(fp):

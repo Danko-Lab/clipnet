@@ -12,7 +12,7 @@ import numpy as np
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
-import clipnet
+from . import clipnet
 
 
 def main():
