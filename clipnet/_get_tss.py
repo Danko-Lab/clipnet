@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script calculates TSS position weight matrices from a fit clipnet.py model.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script fits a NN model using clipnet.py. It requires a NN architecture file, which

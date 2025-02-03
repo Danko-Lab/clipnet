@@ -138,13 +138,6 @@ def cli():
         "Defaults to 100.",
     )
     parser_attribute.add_argument(
-        "-r",
-        "--random_state",
-        type=int,
-        default=None,
-        help="Seed for random state. Defaults to None.",
-    )
-    parser_attribute.add_argument(
         "-c",
         "--skip_check_additivity",
         action="store_true",
@@ -229,9 +222,7 @@ def cli():
 
         # Load data
         seqs_to_explain, twohot_background = attribute.load_seqs(
-            fast_fp=args.fasta_fp,
-            n_subset=args.n_dinucleotide_shuffles,
-            seed=args.random_state,
+            fast_fp=args.fasta_fp, n_subset=args.n_dinucleotide_shuffles
         )
 
         # Define contribution function
@@ -284,7 +275,6 @@ def cli():
             return_twohot_explains=False,
             background_fp=None,
             n_subset=args.n_dinucleotide_shuffles,
-            seed=args.random_state,
         )
 
         # Define contribution function

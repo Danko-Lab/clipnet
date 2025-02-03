@@ -1,3 +1,5 @@
+## NOT IMPLEMENTED
+
 """
 Calculate ISM shuffle scores.
 """

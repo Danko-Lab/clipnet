@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script calculates performance metrics given a set of predictions and ground truth.

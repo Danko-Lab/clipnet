@@ -1,3 +1,5 @@
+## DEPRECATED, USE `clipnet epistasis`
+
 """
 Calculate Deep Feature Interaction Maps (DFIM) for a bunch of examples.
 """
@@ -9,7 +11,6 @@ import os
 
 import numpy as np
 import tqdm
-
 import utils
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
@@ -17,14 +18,14 @@ logging.getLogger("tensorflow").setLevel(logging.FATAL)
 
 import shap
 import tensorflow as tf
-
-import clipnet
 from calculate_deepshap import (
     create_explainers,
     load_seqs,
     profile_contrib,
     quantity_contrib,
 )
+
+import clipnet
 
 # This will fix an error message for running tf.__version__==2.5
 shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
