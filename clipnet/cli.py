@@ -180,7 +180,8 @@ def cli():
         type=int,
         default=20,
         help="Maximum number of sequences to use as background. "
-        "Default is 20 to ensure reasonably fast compute on large datasets.",
+        "Default is 20 to ensure reasonably fast compute on medium-sized datasets. "
+        "reducing to 5 for large datasets may be necessary.",
     )
     parser_epistasis.add_argument(
         "-c",

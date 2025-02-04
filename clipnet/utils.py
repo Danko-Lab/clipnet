@@ -87,7 +87,7 @@ def get_twohot(seq):
     return TwoHotDNA(seq).twohot
 
 
-def get_twohot_from_series(series, cores=8, silence=False):
+def get_twohot_from_series(iterable, cores=8, silence=False):
     """Extracts just the twohot encoding from TwoHotDNA.
 
     Given a pandas series of sequences, returns an twohot-encoded array (n, len, 4)
@@ -101,18 +101,13 @@ def get_twohot_from_series(series, cores=8, silence=False):
         pool = mp.Pool(cores)
         twohot_encoded = list(
             tqdm.tqdm(
-                pool.imap(get_twohot, series.to_list()),
-                total=len(series),
-                desc="Twohot encoding",
-                disable=silence,
+                pool.imap(get_twohot, iterable), desc="Twohot encoding", disable=silence
             )
         )
     else:
         twohot_encoded = [
             get_twohot(seq)
-            for seq in tqdm.tqdm(
-                series.to_list(), desc="Twohot encoding", disable=silence
-            )
+            for seq in tqdm.tqdm(iterable, desc="Twohot encoding", disable=silence)
         ]
     return np.array(twohot_encoded)
 
