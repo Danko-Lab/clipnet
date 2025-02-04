@@ -4,30 +4,30 @@ CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled
 
 ## Installation
 
-To install CLIPNET, first clone this repository:
+To install CLIPNET, we recommend creating an isolated environment. For example, with conda/mamba:
+
+```bash
+mamba create -n clipnet -c conda-forge python~=3.9
+mamba activate clipnet
+```
+
+Then clone this repo and install with `pip`:
 
 ```bash
 git clone https://github.com/Danko-Lab/clipnet.git
-cd clipnet
+cd clipnet/
+pip install -e .
 ```
 
-Then, install dependencies using pip. We recommend creating an isolated environment for working with CLIPNET. For example, with conda/mamba:
-
-```bash
-mamba create -n clipnet -c conda-forge python~=3.9 gcc~=12.1
-mamba activate clipnet
-pip install -r requirements.txt # requirements_cpu.txt if no GPU
-```
-
-An explicit GCC~=12.1 install may be required to get tensorflow-cuda to work correctly. If this causes issues, try removing GCC from the environment creation command and using your system's default compiler. You may also need to configure your CUDA/cudatoolkit/cudnn paths to get GPU support working. See the [tensorflow documentation](https://www.tensorflow.org/install/gpu) for more information.
+You may need to configure your CUDA/cudatoolkit/cudnn paths to get GPU support working. See the [tensorflow documentation](https://www.tensorflow.org/install/gpu) for more information.
 
 ## Download models
 
-Pretrained CLIPNET models are available on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.10408622). Download the models into the `ensemble_models` directory:
+Pretrained CLIPNET models are available on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.10408622).
 
 ```bash
 for fold in {1..9};
-do wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -P ensemble_models/;
+do wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -P clipnet_models/;
 done
 ```
 
@@ -45,61 +45,75 @@ We encode sequences using a "two-hot" encoding. That is, we encoded each individ
 
 ### Command line interface
 
-#### Predictions
-
-To generate predictions using the ensembled model, use the `predict_ensemble.py` script (the `predict_individual_model.py` script can be used to generate predictions with individual model folds). This script takes a fasta file containing 1000 bp records and outputs an hdf5 file containing the predictions for each record. For example:
+CLIPNET can be accessed via a CLI:
 
 ```bash
-python predict_ensemble.py data/test.fa data/test_predictions.h5 --gpu 0
-# Use the --gpu flag to select which GPU to run on
+clipnet -h
 ```
+
+#### Predictions
+
+The `predict` command can be used to generate predictions:
+
+```bash
+clipnet predict -f data/test.fa -o data/test_predictions.npz -m clipnet_models/ -v
+```
+
+The `-m` flag should be used to specify either a path to the directory containing the CLIPNET models (in which case the averaged predictions across all model replicates will be returned) or a specific model path (in which case only the predictions of that model will be returned).
 
 To input individualized sequences, heterozygous positions should be represented using the IUPAC ambiguity codes R (A/G), Y (C/T), S (C/G), W (A/T), K (G/T), M (A/C).
 
-The output hdf5 file will contain two datasets: "track" and "quantity". The track output of the model is a length 1000 vector (500 plus strand concatenated with 500 minus strand) representing the predicted base-resolution profile/shape of initiation. The quantity output represents the total PRO-cap quantity on both strands.
+The output npz file will contain two arrays. The first output (`"arr_0"`, "profile") is a length 1000 vector (500 plus strand concatenated with 500 minus strand) representing the predicted base-resolution profile/shape of initiation. The second output (`"arr_0"`, "quantity") represents the total PRO-cap quantity on both strands.
 
-We note that the track node was not optimized for quantity prediction. As a result, the sum of the track node is not well correlated with the quantity prediction and not a good predictor of the total quantity of initiation. We therefore recommend rescaling the track predictions to sum to the quantity prediction. For example:
+To generate actual predicted tracks, the profile prediction should be rescaled by the quantity prediction. For example:
 
 ```python
-import h5py
 import numpy as np
 
-with h5py.File("data/test_predictions.h5", "r") as f:
-    profile = f["track"][:]
-    quantity = f["quantity"][:]
-    profile_scaled = (profile / np.sum(profile, axis=1)[:, None]) * quantity
+f = np.load("data/test_predictions.npz") 
+profile = f["arr_0"]
+quantity = f["arr_1"]
+profile_scaled = (profile / np.sum(profile, axis=1)[:, None]) * quantity
 ```
 
-#### Feature interpretations
+#### Attributions
 
-CLIPNET uses DeepSHAP to generate feature interpretations. To generate feature interpretations, use the `calculate_deepshap.py` script. This script takes a fasta file containing 1000 bp records and outputs two npz files containing: (1) feature interpretations for each record and (2) onehot-encoded sequence. It supports two modes that can be set with `--mode`: "profile" and "quantity". The "profile" mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the "quantity" mode calculates interpretations for the quantity node of the model.
+CLIPNET uses [DeepSHAP](https://shap.readthedocs.io/en/latest/generated/shap.DeepExplainer.html) to generate attributions. To generate DeepSHAP scores, use the `attribute` command. This script takes a fasta file containing 1000 bp records and outputs DeepSHAP attributions and optionally one-hot encoded sequences. Please note that both attribution and ohe are saved as length last for compatibility with [tfmodisco-lite](https://github.com/jmschrei/tfmodisco-lite/).
+
+Two different attribution modes that can be set with `-a/--attribution_type`: `profile` and `quantity`. The `profile` mode calculates interpretations for the profile node of the model (using the profile metric proposed in BPNet), while the `quantity` mode calculates interpretations for the quantity node of the model.
 
 ```bash
-python calculate_deepshap.py \
-    data/test.fa \
-    data/test_deepshap_quantity.npz \
-    data/test_onehot.npz \
-    --mode quantity \
-    --gpu 0
+clipnet attribute \
+    -f data/test.fa.gz \
+    -o data/test_quantity_shap.npz \
+    -m clipnet_models/ \
+    -a quantity \
+    -v -c
 
-python calculate_deepshap.py \
-    data/test.fa \
-    data/test_deepshap_profile.npz \
-    data/test_onehot.npz \
-    --mode profile \
-    --gpu 0
+# -c maybe needed to avoid precision errors.
 ```
 
-Note that CLIPNET generally accepts two-hot encoded sequences as input, with the array being structured as (# sequences, 1000, 4). However, feature interpretations are much easier to do with just a haploid/fully homozygous genome, so we recommend just doing interpretations on the reference genome sequence. tfmodisco-lite also expects contribution scores and sequence arrays to be length last, i.e., (# sequences, 4, 1000), with the sequence array being one-hot. To accomodate these, `calculate_deepshap.py` will automatically convert the input sequence array to length last and onehot encoded, and will also write the output contribution scores as length last. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. The outputs of this model can be used as inputs to tfmodisco-lite to generate motif logos and motif tracks.
+Note that while CLIPNET accepts two-hot encoded sequences to accomodate heterozygous positions, attributions are much more interpretable when using a haploid/fully homozygous genome, so we recommend avoiding heterozygous positions for attributions. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero.
 
-Both DeepSHAP and tfmodisco-lite computations are quite slow when performed on a large number of sequences, so we (a) recommend running DeepSHAP on a GPU using the `--gpu` flag and (b) if you have access to many GPUs, calculating DeepSHAP scores for the model folds in parallel using the `--model_fp` flag, then averaging them. We also provide precomputed DeepSHAP scores and TF-MoDISco results for a genome-wide set of PRO-cap peaks called in the LCL dataset (https://zenodo.org/records/10597358).
+#### Discovering epistatic motifs
 
-#### Genomic *in silico* mutagenesis scans
-
-To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results ("corr_ism_shuffle" and "log_quantity_ism_shuffle") for each record. For example:
+`clipnet` supports epistasis analyses using [Deep Feature Interaction Maps (DFIM)](https://github.com/kundajelab/dfim). Please note that this is a custom reimplementation of DFIM using DeepSHAP as the attribution backend, as the original DFIM package is unmaintained and difficult to install. DFIM scores can be calculated for a given fasta file using the `epistasis` command:
 
 ```bash
-python calculate_ism_shuffle.py data/test.fa data/test_ism.npz --gpu 0
+clipnet epistasis \
+    -f data/test.fa \
+    -o data/test_dfim_quantity.npz \
+    -m clipnet_models/ \
+    -s 250 -e 750 \
+    -v
+```
+
+#### Genomic *in silico* mutagenesis scans NOT YET IMPLEMENTED
+
+To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results (`corr_ism_shuffle` and `logfc_ism_shuffle`) for each record. For example:
+
+```bash
+clipnet ism_shuffle -f data/test.fa -o data/test_ism.npz -v
 ```
 
 ### API usage
@@ -109,19 +123,18 @@ CLIPNET models can be directly loaded as follows. Individual models can simply b
 ```python
 import tensorflow as tf
 
-nn = tf.keras.models.load_model("ensemble_models/fold_1.h5", compile=False)
+nn = tf.keras.models.load_model("clipnet_models/fold_1.h5", compile=False)
 ```
 
 The model ensemble is constructed by averaging track and quantity outputs across all 9 model folds. To make this easy, we've provided a simple API in the `clipnet.CLIPNET` class for doing this. Moreover, to make reading fasta files into the correct format easier, we've provided the helper function `utils.twohot_fasta`. For example:
 
 ```python
 import sys
-sys.path.append(PATH_TO_THIS_DIRECTORY)
 import clipnet
 import utils
 
-nn = clipnet.CLIPNET(n_gpus=0) # by default, this will be 1 and will use CUDA
-ensemble = nn.construct_ensemble()
+nn = clipnet.CLIPNET()
+ensemble = nn.construct_ensemble("clipnet_models/")
 seqs = utils.twohot_fasta("data/test.fa")
 
 predictions = ensemble.predict(seqs)
