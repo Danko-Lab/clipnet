@@ -10,6 +10,7 @@ import glob
 import os
 
 import numpy as np
+import tqdm
 from silence_tensorflow import silence_tensorflow
 
 silence_tensorflow()
@@ -173,7 +174,7 @@ def cli():
     parser_epistasis.add_argument(
         "-e", "--end", type=int, default=750, help="End position for DFIM."
     )
-    parser.add_argument(
+    parser_epistasis.add_argument(
         "-d",
         "--n_dinucleotide_shuffles",
         type=int,
@@ -181,7 +182,7 @@ def cli():
         help="Maximum number of sequences to use as background. "
         "Default is 20 to ensure reasonably fast compute on large datasets.",
     )
-    parser.add_argument(
+    parser_epistasis.add_argument(
         "-c",
         "--skip_check_additivity",
         action="store_true",
@@ -304,9 +305,11 @@ def cli():
                     start=args.start,
                     stop=args.end,
                     check_additivity=not args.skip_check_additivity,
-                    silence=not args.verbose,
+                    silence=True,
                 )
-                for rec in seqs_to_explain
+                for rec in tqdm.tqdm(
+                    seqs_to_explain, desc="Calculating DFIM", disable=not args.verbose
+                )
             ]
         )
 

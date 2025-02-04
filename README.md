@@ -126,16 +126,16 @@ import tensorflow as tf
 nn = tf.keras.models.load_model("clipnet_models/fold_1.h5", compile=False)
 ```
 
-The model ensemble is constructed by averaging track and quantity outputs across all 9 model folds. To make this easy, we've provided a simple API in the `clipnet.CLIPNET` class for doing this. Moreover, to make reading fasta files into the correct format easier, we've provided the helper function `utils.twohot_fasta`. For example:
+The model ensemble is constructed by averaging track and quantity outputs across all 9 model folds. To make this easy, we've provided a simple API in the `clipnet.clipnet.CLIPNET` class for doing this. Moreover, to make reading fasta files into the correct format easier, we've provided the helper function `clipnet.utils.get_twohot_fasta_sequences`. For example:
 
 ```python
 import sys
-import clipnet
-import utils
+from clipnet.clipnet import CLIPNET
+from clipnet.utils import get_twohot_fasta_sequences
 
-nn = clipnet.CLIPNET()
+nn = CLIPNET()
 ensemble = nn.construct_ensemble("clipnet_models/")
-seqs = utils.twohot_fasta("data/test.fa")
+seqs = get_twohot_fasta_sequences("data/test.fa")
 
 predictions = ensemble.predict(seqs)
 ```

@@ -75,7 +75,12 @@ def scalar_contrib(model):
 
 
 def load_seqs(
-    fasta_fp, return_twohot_explains=True, background_fp=None, n_subset=100, seed=None
+    fasta_fp,
+    return_twohot_explains=True,
+    background_fp=None,
+    n_subset=100,
+    seed=None,
+    silence=False,
 ):
     """
     Handles loading sequences for DeepLIFT/SHAP attribution.
@@ -97,15 +102,14 @@ def load_seqs(
         )
     ]
     shuffled_reference = [
-        shuffle.kshuffle(rec.seq, random_seed=seed)[0] for rec in reference
+        shuffle.kshuffle(rec.seq, random_seed=seed)[0]
+        for rec in tqdm.tqdm(reference, desc="Shuffling sequences", disable=silence)
     ]
-    twohot_background = np.array(
-        [utils.TwoHotDNA(seq).twohot for seq in shuffled_reference]
+    twohot_background = utils.get_twohot_from_series(
+        shuffled_reference, silence=silence
     )
     if return_twohot_explains:
-        seqs_to_explain = np.array(
-            [utils.TwoHotDNA(seq).twohot for seq in seqs_to_explain]
-        )
+        seqs_to_explain = utils.get_twohot_from_series(seqs_to_explain, silence=silence)
     return seqs_to_explain, twohot_background
 
 

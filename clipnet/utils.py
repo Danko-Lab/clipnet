@@ -93,11 +93,12 @@ def get_twohot_from_series(series, cores=8, silence=False):
     Given a pandas series of sequences, returns an twohot-encoded array (n, len, 4)
     array of all sequences.
     """
+    import multiprocessing as mp
+
+    cores = min(cores, mp.cpu_count())
     if cores > 1:
         # Use multiprocessing to parallelize twohot encoding
-        import multiprocessing as mp
-
-        pool = mp.Pool(min(cores, mp.cpu_count()))
+        pool = mp.Pool(cores)
         twohot_encoded = list(
             tqdm.tqdm(
                 pool.imap(get_twohot, series.to_list()),
