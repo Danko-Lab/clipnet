@@ -109,6 +109,7 @@ def load_seqs(
         shuffled_reference, silence=silence
     )
     if return_twohot_explains:
+        seqs_to_explain = [rec.seq for rec in seqs_to_explain]
         seqs_to_explain = utils.get_twohot_from_series(seqs_to_explain, silence=silence)
     return seqs_to_explain, twohot_background
 
