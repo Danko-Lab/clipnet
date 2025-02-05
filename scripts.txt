@@ -1,3 +1,5 @@
+# Scripts I'm using to test out functionality & reproducing/improving some of the core analyses in the CLIPNET paper
+
 for i in {1..9}; do 
 clipnet attribute \
     -f data/lcl/merged_1_divergent_peaks_1kb.fa.gz \
@@ -25,3 +27,11 @@ time modisco report \
     -i merged_1_divergent_peaks_1kb_quantity_shap.modisco.h5 \
     -o merged_1_divergent_peaks_1kb_quantity_shap.modisco \
     -m /home2/ayh8/data/JASPAR/JASPAR2024_CORE_vertebrates_non-redundant_pfms_meme.txt
+
+clipnet epistasis \
+    -f tata_tss_windows_reference_seq_fwd.fna.gz \
+    -o tata_tss_windows_reference_seq_fwd_profile.npz \
+    -m clipnet_models/ \
+    -a profile \
+    -s 250 -e 750 \
+    -v -c -n 5

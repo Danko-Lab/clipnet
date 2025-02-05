@@ -10,13 +10,14 @@ import glob
 import os
 
 import numpy as np
+import pyfastx
 import tqdm
 from silence_tensorflow import silence_tensorflow
 
 silence_tensorflow()
 import tensorflow as tf
 
-from . import attribute, clipnet, epistasis
+from . import attribute, clipnet, epistasis, ism_shuffle
 
 _help = """
 The following commands are available:
@@ -151,6 +152,36 @@ def cli():
         help="Calculate ISM shuffle scores for a given set of regions.",
         parents=[parser_parent],
     )
+    parser_ism_shuffle.add_argument(
+        "-n",
+        "--n_shuffles",
+        type=int,
+        default=5,
+        help="Number of shuffles/mutations to perform for each position. "
+        "Defaults to 5.",
+    )
+    parser_ism_shuffle.add_argument(
+        "-s",
+        "--mut_size",
+        type=int,
+        default=10,
+        help="Size of mutations to use. That is, how large of a window to shuffle? "
+        "Defaults to 10.",
+    )
+    parser_ism_shuffle.add_argument(
+        "-e",
+        "--edge_padding",
+        type=int,
+        default=50,
+        help="Number of positions from edge that we'll skip mutating on.",
+    )
+    parser_ism_shuffle.add_argument(
+        "-p",
+        "--pseudocount",
+        type=float,
+        default=1e-6,
+        help="Pseudocounts for calculations to avoid log or division by 0.",
+    )
 
     # EPISTASIS PARAMS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -189,6 +220,7 @@ def cli():
         action="store_true",
         help="Disables check for additivity of shap results.",
     )
+
     args = parser.parse_args()
 
     # MAIN CODE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -267,9 +299,34 @@ def cli():
         if args.hyp_attr_fp is not None:
             np.savez_compressed(args.hyp_attr_fp, hyp_explanations.swapaxes(1, 2))
 
+    # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    elif args.cmd == "ism_shuffle":
+        if os.path.isdir(args.model_fp):
+            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
+            model = nn.construct_ensemble(model_names, silence=args.silence)
+        else:
+            model = tf.keras.models.load_model(args.model_fp, compile=False)
+        sequences = pyfastx.Fasta(args.fasta_fp)
+        corr_scores, logfc_scores = ism_shuffle.ism_shuffle(
+            model,
+            sequences,
+            mut_size=args.mut_size,
+            n_shuffles=args.n_shuffles,
+            edge_padding=args.edge_padding,
+            corr_pseudocount=args.pseudocount,
+            logfc_pseudocount=args.pseudocount,
+            batch_size=args.batch_size,
+            verbose=args.verbose,
+        )
+        np.savez_compressed(args.output_fp, corr_scores, logfc_scores)
+
     # EPISTASIS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     elif args.cmd == "epistasis":
+        # Disable TF32 to reduce potential low precision issues
+        tf.config.experimental.enable_tensor_float_32_execution(False)
+
         # Load sequences as strings
         seqs_to_explain, twohot_background = attribute.load_seqs(
             fasta_fp=args.fasta_fp,
@@ -316,11 +373,6 @@ def cli():
 
         # Save
         np.savez(args.output_fp, dfims)
-
-    # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    elif args.cmd == "ism_shuffle":
-        pass
 
     # INVALID ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

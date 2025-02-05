@@ -40,11 +40,23 @@ def dfim(explainers, major_seq, start, stop, check_additivity=True, silence=Fals
 
     Parameters
     ----------
-    # WRITE WHEN CODEIUM STARTS WORKING AGAIN
+    explainers : list
+        List of shap.DeepExplainer objects
+    major_seq : str
+        The sequence to calculate DFIM scores for.
+    start : int
+        The start position of where to calculate DFIM.
+    stop : int
+        The stop position of where to calculate DFIM.
+    check_additivity : bool, optional
+        Whether to check for additivity, by default True.
+    silence : bool, optional
+        Whether to silence tqdm, by default False
 
     Returns
     -------
-    # WRITE WHEN CODEIUM STARTS WORKING AGAIN
+    np.array, shape (stop - start, len(alphabet) - 1, len(sequence), len(alphabet))
+        The DFIM scores for each position.
     """
     major_twohot = np.expand_dims(utils.TwoHotDNA(major_seq).twohot, axis=0)
     dfim_range = list(range(start, stop))

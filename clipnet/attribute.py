@@ -86,9 +86,31 @@ def load_seqs(
     Handles loading sequences for DeepLIFT/SHAP attribution.
 
     Parameters
+    ----------
+    fasta_fp : str
+        Path to fasta file with sequences to explain
+    return_twohot_explains : bool, optional
+        Whether to return twohot encoding of sequences to explain or just strings,
+        by default True
+    background_fp : str, optional
+        Path to fasta file with sequences to use to generate dinucleotide shuffled
+        background, by default None
+        If None, samples and shuffles sequences from fasta_fp.
+    n_subset : int, optional
+        Number of sequences to use as background, by default 100. Use fewer
+        sequences to speed up computation.
+    seed : int, optional
+        Random seed to use for shuffling sequences, by default None
+    silence : bool, optional
+        Whether to silence tqdm, by default False
 
     Returns
-
+    -------
+    seqs_to_explain : list or array
+        sequences to explain (twohot-encoded array if return_twohot_explains=True,
+        otherwise list of strings)
+    twohot_background : array
+        dinucleotide shuffled background, twohot-encoded array
     """
     np.random.seed(seed)
     seqs_to_explain = pyfastx.Fasta(fasta_fp)
@@ -105,9 +127,7 @@ def load_seqs(
         shuffle.kshuffle(rec.seq, random_seed=seed)[0]
         for rec in tqdm.tqdm(reference, desc="Shuffling sequences", disable=silence)
     ]
-    twohot_background = utils.get_twohot_from_series(
-        shuffled_reference, silence=silence
-    )
+    twohot_background = utils.get_twohot_from_series(shuffled_reference, silence=True)
     if return_twohot_explains:
         seqs_to_explain = [rec.seq for rec in seqs_to_explain]
         seqs_to_explain = utils.get_twohot_from_series(seqs_to_explain, silence=silence)
@@ -119,9 +139,20 @@ def create_explainers(model_fps, twohot_background, contrib, silence=False):
     Convenient wrapper function for creating shap.DeepExplainer objects.
 
     Parameters
+    ----------
+    model_fps : list
+        List of paths to model files
+    twohot_background : array
+        Twohot-encoded background sequences
+    contrib : function
+        Attribution function (see above).
+    silence : bool, optional
+        Whether to silence tqdm, by default False
 
     Returns
-
+    -------
+    explainers : list
+        List of shap.DeepExplainer objects
     """
     models = [
         tf.keras.models.load_model(fp, compile=False)

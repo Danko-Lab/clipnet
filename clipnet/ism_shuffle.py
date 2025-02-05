@@ -25,7 +25,7 @@ def ism_shuffle(
     n_shuffles=5,
     edge_padding=50,
     corr_pseudocount=1e-6,
-    logfc_pseudocount=1e-3,
+    logfc_pseudocount=1e-6,
     batch_size=256,
     verbose=False,
 ):

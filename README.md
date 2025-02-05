@@ -26,6 +26,7 @@ You may need to configure your CUDA/cudatoolkit/cudnn paths to get GPU support w
 Pretrained CLIPNET models are available on [Zenodo](https://zenodo.org/doi/10.5281/zenodo.10408622).
 
 ```bash
+mkdir -p clipnet_models/
 for fold in {1..9};
 do wget https://zenodo.org/records/10408623/files/fold_${fold}.h5 -P clipnet_models/;
 done
@@ -103,6 +104,13 @@ Note that while CLIPNET accepts two-hot encoded sequences to accomodate heterozy
 clipnet epistasis \
     -f data/test.fa \
     -o data/test_dfim_quantity.npz \
+    -m clipnet_models/ \
+    -s 250 -e 750 \
+    -v
+
+clipnet epistasis \
+    -f data/test.fa \
+    -o data/test_dfim_profile.npz \
     -m clipnet_models/ \
     -s 250 -e 750 \
     -v
