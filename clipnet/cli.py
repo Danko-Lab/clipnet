@@ -153,8 +153,8 @@ def cli():
         parents=[parser_parent],
     )
     parser_ism_shuffle.add_argument(
-        "-n",
-        "--n_shuffles",
+        "-d",
+        "--n_dinucleotide_shuffles",
         type=int,
         default=5,
         help="Number of shuffles/mutations to perform for each position. "
