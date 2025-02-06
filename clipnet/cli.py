@@ -273,10 +273,11 @@ def cli():
         # Define contribution function
         if args.n_outputs == 1:
             contrib = attribute.scalar_contrib
-        if args.attribution_type == "quantity":
-            contrib = attribute.quantity_contrib
-        elif args.attribution_type == "profile":
-            contrib = attribute.profile_contrib
+        else:
+            if args.attribution_type == "quantity":
+                contrib = attribute.quantity_contrib
+            elif args.attribution_type == "profile":
+                contrib = attribute.profile_contrib
 
         # Create explainers
         if os.path.isdir(args.model_fp):
