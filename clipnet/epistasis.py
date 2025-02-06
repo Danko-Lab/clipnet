@@ -12,7 +12,7 @@ import tqdm
 from . import utils
 
 
-def get_most_extreme(arr, axis=None):
+def extrema(arr, axis=None):
     """
     Returns the most extreme value in a tensor along a given dimension.
 

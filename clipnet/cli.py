@@ -11,6 +11,7 @@ import os
 
 import numpy as np
 import pyfastx
+import seqlogo
 import tqdm
 from silence_tensorflow import silence_tensorflow
 
@@ -23,10 +24,10 @@ _help = """
 The following commands are available:
     predict         Calculate predictions for a CLIPNET model
     attribute       Calculate DeepLIFT/SHAP attributions for a CLIPNET model
-    epistasis       Calculate Deep Feature Interaction Maps for a CLIPNET model
-The following commands are planned but are not yet implemented.
     ism_shuffle     Calculate ISM shuffle scores for a CLIPNET model
-    tss
+    epistasis       Calculate Deep Feature Interaction Maps for a CLIPNET model
+    tss_pwm         Calculate TSS PWMs for a CLIPNET model
+The following commands are planned but are not yet implemented.
     activation_maps
     fit
 """
@@ -221,6 +222,17 @@ def cli():
         help="Disables check for additivity of shap results.",
     )
 
+    # TSS PWM PARAMS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    parser_tss = subparsers.add_parser(
+        "tss_pwm",
+        help="Calculate TSS PWMs for a given set of regions.",
+        parents=[parser_parent],
+    )
+    parser_tss.add_argument(
+        "-w", "--pwm_window", type=int, default=8, help="Size of PWM window."
+    )
+
     args = parser.parse_args()
 
     # MAIN CODE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -302,12 +314,15 @@ def cli():
     # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     elif args.cmd == "ism_shuffle":
+        # Load models and sequences
         if os.path.isdir(args.model_fp):
             model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
             model = nn.construct_ensemble(model_names, silence=args.silence)
         else:
             model = tf.keras.models.load_model(args.model_fp, compile=False)
         sequences = pyfastx.Fasta(args.fasta_fp)
+
+        # Calculate ISM shuffle
         corr_scores, logfc_scores = ism_shuffle.ism_shuffle(
             model,
             sequences,
@@ -319,6 +334,8 @@ def cli():
             batch_size=args.batch_size,
             verbose=args.verbose,
         )
+
+        # Save
         np.savez_compressed(args.output_fp, corr_scores, logfc_scores)
 
     # EPISTASIS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -337,10 +354,11 @@ def cli():
         # Define contribution function
         if args.n_outputs == 1:
             contrib = attribute.scalar_contrib
-        if args.attribution_type == "quantity":
-            contrib = attribute.quantity_contrib
-        elif args.attribution_type == "profile":
-            contrib = attribute.profile_contrib
+        else:
+            if args.attribution_type == "quantity":
+                contrib = attribute.quantity_contrib
+            elif args.attribution_type == "profile":
+                contrib = attribute.profile_contrib
 
         # Create explainers
         if os.path.isdir(args.model_fp):
@@ -373,6 +391,13 @@ def cli():
 
         # Save
         np.savez(args.output_fp, dfims)
+
+    # TSS PWM ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    elif args.cmd == "tss_pwm":
+        tss = nn.compute_tss_pwm(args.model_fp, args.fasta_fp, window=args.pwm_window)
+        file_ext = os.path.splitext(args.output_fp)[-1].strip(".")
+        seqlogo.seqlogo(tss, format=file_ext, filename=args.output_fp, size="medium")
 
     # INVALID ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
