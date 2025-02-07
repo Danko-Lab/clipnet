@@ -126,10 +126,12 @@ def cli():
     )
     parser_attribute.add_argument(
         "-y",
-        "--hyp_attr_fp",
+        "--save_hypothetical",
         type=str,
-        default=None,
-        help="Where to save hypothetical attributions. Defaults to not saving.",
+        action="store_true",
+        help="Whether to save hypothetical sequences. If not set, will save actual "
+        "contributions, i.e., ohe * attribution. This should be set if you intend to "
+        "run tfmodisco on the attributions.",
     )
     parser_attribute.add_argument(
         "-d",
@@ -298,7 +300,7 @@ def cli():
             )
 
         # Calculate attributions
-        explanations, hyp_explanations = attribute.calculate_scores(
+        hyp_explanations = attribute.calculate_scores(
             explainers=explainers,
             seqs_to_explain=seqs_to_explain,
             batch_size=args.batch_size,
@@ -307,10 +309,14 @@ def cli():
         )
 
         # Save
-        np.savez_compressed(args.output_fp, explanations.swapaxes(1, 2))
+        if args.save_hypothetical:
+            np.savez_compressed(args.output_fp, hyp_explanations.swapaxes(1, 2))
         # Save hypothetical attributions
-        if args.hyp_attr_fp is not None:
-            np.savez_compressed(args.hyp_attr_fp, hyp_explanations.swapaxes(1, 2))
+        else:
+            np.savez_compressed(
+                args.output_fp,
+                (hyp_explanations * (seqs_to_explain / 2)).swapaxes(1, 2),
+            )
 
     # ISM SHUFFLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

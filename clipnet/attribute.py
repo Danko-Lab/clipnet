@@ -156,7 +156,7 @@ def create_explainers(model_fps, twohot_background, contrib, silence=False):
     """
     models = [
         tf.keras.models.load_model(fp, compile=False)
-        for fp in tqdm.tqdm(model_fps, desc="Loading models")
+        for fp in tqdm.tqdm(model_fps, desc="Loading models", disable=silence)
     ]
     explainers = []
     for model in tqdm.tqdm(models, desc="Creating explainers", disable=silence):
@@ -200,5 +200,4 @@ def calculate_scores(
         mean_explanations = np.array(concat_explanations).mean(axis=0)
     else:
         mean_explanations = concat_explanations[0]
-    explanations = mean_explanations * seqs_to_explain
-    return explanations, mean_explanations
+    return mean_explanations
