@@ -127,7 +127,6 @@ def cli():
     parser_attribute.add_argument(
         "-y",
         "--save_hypothetical",
-        type=str,
         action="store_true",
         help="Whether to save hypothetical sequences. If not set, will save actual "
         "contributions, i.e., ohe * attribution. This should be set if you intend to "
