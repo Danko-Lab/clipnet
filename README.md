@@ -2,6 +2,10 @@
 
 CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled convolutional neural network that predicts transcription initiation from DNA sequence at single nucleotide resolution. We describe CLIPNET in our [preprint](https://www.biorxiv.org/content/10.1101/2024.03.13.583868) on bioRxiv. This repository contains code for working with CLIPNET, namely for generating predictions and feature interpretations and performing *in silico* mutagenesis scans. To reproduce the figures in our paper, please see the [clipnet_paper GitHub repo](https://github.com/Danko-Lab/clipnet_paper/).
 
+## CODE REFACTORING NOTICE:
+
+I have significantly altered the structure of this code base since its original release with the preprint. The new CLIPNET package should be significantly easier to use (`pip` installable, with clearer CLI and API). To access the code as it was prior to this refactoring, please check out the (unmaintained) [`deprecated`](https://github.com/Danko-Lab/clipnet/tree/deprecated) branch.
+
 ## Installation
 
 To install CLIPNET, we recommend creating an isolated environment. For example, with conda/mamba:
