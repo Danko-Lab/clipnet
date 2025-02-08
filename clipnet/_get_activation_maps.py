@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script calculates TSS position weight matrices from a fit clipnet.py model.
@@ -12,11 +12,12 @@ import joblib
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
-import clipnet
+from . import clipnet
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("model_fp", type=str, help="file path to model fold to load.")
     parser.add_argument(
         "fasta_fp",
         type=str,
@@ -24,30 +25,38 @@ def main():
         help="If pyfastx throws an error, try deleting .fxi index files.",
     )
     parser.add_argument(
+        "predicted_tss_fp",
+        type=str,
+        help="Where to load predicted TSS positions from.",
+    )
+    parser.add_argument(
         "output",
         type=str,
         help="where should the output be written? Will export a joblib.gz file.",
     )
     parser.add_argument(
-        "--model_dir",
-        type=str,
-        default="ensemble_models/",
-        help="directory where to load models from.",
+        "--conv_layer",
+        type=int,
+        default=1,
+        help="Which conv layer to get activations for",
     )
     parser.add_argument(
-        "--gpu",
+        "--window",
         type=int,
-        default=None,
-        help="Index of GPU to use (starting at 0). If None, will use CPU.",
+        default=200,
+        help="how wide of a window around tss to select.",
     )
     args = parser.parse_args()
 
-    if args.gpu is not None:
-        nn = clipnet.CLIPNET(n_gpus=1, use_specific_gpu=args.gpu)
-    else:
-        nn = clipnet.CLIPNET(n_gpus=0)
-    tss = nn.compute_tss(args.model_dir, args.fasta_fp)
-    joblib.dump(tss, args.output)
+    nn = clipnet.CLIPNET(n_gpus=0)
+    activations = nn.get_activation_maps(
+        args.model_fp,
+        args.fasta_fp,
+        args.predicted_tss_fp,
+        layer=args.conv_layer,
+        window=args.window,
+    )
+    joblib.dump(activations, args.output)
 
 
 if __name__ == "__main__":

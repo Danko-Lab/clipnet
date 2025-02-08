@@ -1,3 +1,5 @@
+## NOT IMPLEMENTED. PART OF THE FITTING SCRIPTS
+
 """
 Calculates dataset parameters needed by clipnet. Supply a path to the processed data
 and an output directory. This script will write json files to the output directory

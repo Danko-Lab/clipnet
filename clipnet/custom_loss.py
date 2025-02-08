@@ -1,4 +1,9 @@
-"""This implements a number of custom loss/metric functions for use in CLIPNET."""
+# custom_loss.py
+# Adam He <adamyhe@gmail.com>
+
+"""
+This implements a number of custom loss/metric functions for use in CLIPNET.
+"""
 
 import tensorflow as tf
 from scipy.stats import spearmanr

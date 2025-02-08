@@ -1,9 +1,14 @@
-## Architecture of neural network currently in use for CLIPNET.
+# rnn_v10.py
+# Adam He <adamyhe@gmail.com>
+
+"""
+Architecture and hyperparameters of neural network currently in use for CLIPNET.
+"""
 
 import tensorflow as tf
 from tensorflow.keras import layers
 
-import custom_loss
+from . import custom_loss
 
 # model fitting hyperparameters
 epochs = 200

@@ -1,3 +1,6 @@
+# cgen.py
+# Adam He <adamyhe@gmail.com>
+
 """
 This file contains a number of functions and the class CGen (CLIPNET Generator) that
 assist in loading data while training CLIPNET models.
@@ -10,7 +13,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-import utils
+from . import utils
 
 
 def load_track(fp, unpackbits=False):

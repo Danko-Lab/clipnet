@@ -1,11 +1,12 @@
+# clipnet.py
+# Adam He <adamyhe@gmail.com>
+
 """
 This file contains the CLIPNET class, which contains most of the main functions used to
 it, predict, and interpret the convolutional neural networks used in the CLIPNET project.
 """
 
-import importlib
 import json
-import logging
 import math
 import os
 import time
@@ -13,16 +14,18 @@ from pathlib import Path
 
 import GPUtil
 import numpy as np
+from silence_tensorflow import silence_tensorflow
 
-import cgen
-import utils
+from . import utils
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
-logging.getLogger("tensorflow").setLevel(logging.FATAL)
+silence_tensorflow()
 import tensorflow as tf
 import tqdm
 from tensorflow.keras.callbacks import CSVLogger
 from tqdm.keras import TqdmCallback
+
+from . import cgen
+from . import rnn_v10 as nn
 
 
 class TimeHistory(tf.keras.callbacks.Callback):
@@ -44,8 +47,6 @@ class CLIPNET:
     ------------
     n_gpus=1                - how many gpus to use.
     use_specific_gpu=0      - if n_gpus==1, allows choice of specific gpu.
-    prefix='rnn_v10'        - prefix for nn_architecture file and the prefix the models
-                              will be saved under while training.
 
     public functions
     ------------
@@ -57,14 +58,13 @@ class CLIPNET:
 
     def __init__(
         self,
+        name=None,
         n_gpus=1,
         use_specific_gpu=0,
-        prefix="rnn_v10",
     ):
-        self.prefix = prefix
+        self.name = "clipnet" if name is None else name
         self.n_gpus = n_gpus
         self.use_specific_gpu = use_specific_gpu
-        self.nn = importlib.import_module(self.prefix)
         self.n_channels = 4
         self.__gpu_settings()
 
@@ -73,7 +73,9 @@ class CLIPNET:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def __gpu_settings(self):
-        if self.n_gpus == 0:
+        if self.use_specific_gpu < 0:
+            self.n_gpus = 0
+        if self.n_gpus <= 0:
             print("Requested 0 GPUs. Turning off GPUs.")
             tf.config.set_visible_devices([], "GPU")
             self.strategy = tf.distribute.get_strategy()
@@ -114,13 +116,17 @@ class CLIPNET:
 
     def __set_model_locations(self, resume_checkpoint):
         self.json_filepath = os.path.join(
-            self.model_dir, f"{self.prefix}_architecture.json"
+            self.model_dir, f"{self.name}_architecture.json"
         )
         if resume_checkpoint is not None:
-            self.model_filepath = os.path.join(self.model_dir, "clipnet_resume.hdf5")
+            self.model_filepath = os.path.join(
+                self.model_dir, f"{self.name}_resume.hdf5"
+            )
         else:
-            self.model_filepath = os.path.join(self.model_dir, "clipnet.hdf5")
-        self.history_filepath = os.path.join(self.model_dir, "clipnet_history.json")
+            self.model_filepath = os.path.join(self.model_dir, f"{self.name}.hdf5")
+        self.history_filepath = os.path.join(
+            self.model_dir, f"{self.name}_history.json"
+        )
 
     def __adjust_by_n_gpus(self):
         """This function adjusts parameters by the number of GPUs used in training."""
@@ -128,11 +134,11 @@ class CLIPNET:
             n_gpus = 1
         else:
             n_gpus = self.n_gpus
-        opt_hyperparameters = self.nn.opt_hyperparameters
+        opt_hyperparameters = nn.opt_hyperparameters.copy()
         opt_hyperparameters["learning_rate"] = (
-            n_gpus * self.nn.opt_hyperparameters["learning_rate"]
+            n_gpus * nn.opt_hyperparameters["learning_rate"]
         )
-        batch_size = n_gpus * self.nn.batch_size
+        batch_size = n_gpus * nn.batch_size
         steps_per_epoch = math.floor(
             sum(self.dataset_params["n_samples_per_train_fold"]) * 2 / batch_size
         )
@@ -187,29 +193,29 @@ class CLIPNET:
                 )
                 opt_hyperparameters, *_ = self.__adjust_by_n_gpus()
                 self.fit_model.compile(
-                    optimizer=self.nn.optimizer(**opt_hyperparameters),
-                    loss=self.nn.loss,
+                    optimizer=nn.optimizer(**opt_hyperparameters),
+                    loss=nn.loss,
                     loss_weights={"shape": 1, "sum": self.dataset_params["weight"]},
-                    metrics=self.nn.metrics,
+                    metrics=nn.metrics,
                 )
                 model = self.fit_model
             else:
-                model = self.nn.construct_nn(
+                model = nn.construct_nn(
                     self.dataset_params["window_length"],
                     self.dataset_params["output_length"],
                 )
                 model.compile(
-                    optimizer=self.nn.optimizer(**opt_hyperparameters),
-                    loss=self.nn.loss,
+                    optimizer=nn.optimizer(**opt_hyperparameters),
+                    loss=nn.loss,
                     loss_weights={"shape": 1, "sum": self.dataset_params["weight"]},
-                    metrics=self.nn.metrics,
+                    metrics=nn.metrics,
                 )
 
             checkp = tf.keras.callbacks.ModelCheckpoint(
                 self.model_filepath, verbose=0, save_best_only=True
             )
             early_stopping = tf.keras.callbacks.EarlyStopping(
-                verbose=1, patience=self.nn.patience
+                verbose=1, patience=nn.patience
             )
             training_time = TimeHistory()
             tqdm_callback = TqdmCallback(
@@ -229,7 +235,7 @@ class CLIPNET:
         fit_model = model.fit(
             x=train_gen,
             validation_data=val_gen,
-            epochs=self.nn.epochs,
+            epochs=nn.epochs,
             steps_per_epoch=steps_per_epoch,
             verbose=0,
             callbacks=[
@@ -312,15 +318,15 @@ class CLIPNET:
             model = self.construct_ensemble(model_fp, outputs=outputs, silence=silence)
         else:
             model = tf.keras.models.load_model(model_fp, compile=False)
-        if low_mem and self.nn.batch_size < X.shape[0]:
+        if low_mem and nn.batch_size < X.shape[0]:
             # tensorflow has a memory leak issue in 2.?. We can fix this by using
             # model.__call__() on batches rather than the default predict.
-            batch_size = self.nn.batch_size
+            batch_size = nn.batch_size
             y_predict_handle = [
                 model.predict(X[i : i + batch_size, :, :], verbose=0)
                 for i in tqdm.tqdm(
                     range(0, X.shape[0], batch_size),
-                    desc=f"Predicting in batches of {self.nn.batch_size}",
+                    desc=f"Predicting in batches of {nn.batch_size}",
                     disable=silence,
                 )
             ]
@@ -336,7 +342,7 @@ class CLIPNET:
                     f"Invalid number of outputs: {outputs}. Must be 1 or 2."
                 )
         else:
-            y_predict = model.predict(X, batch_size=self.nn.batch_size, verbose=1)
+            y_predict = model.predict(X, batch_size=nn.batch_size, verbose=1)
         return y_predict
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

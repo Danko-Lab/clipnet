@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script calculates TSS position weight matrices from a fit clipnet.py model.
@@ -8,11 +8,11 @@ import argparse
 import logging
 import os
 
-import joblib
+import pandas as pd
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
-import clipnet
+from . import clipnet
 
 
 def main():
@@ -25,14 +25,9 @@ def main():
         help="If pyfastx throws an error, try deleting .fxi index files.",
     )
     parser.add_argument(
-        "predicted_tss_fp",
-        type=str,
-        help="Where to load predicted TSS positions from.",
-    )
-    parser.add_argument(
         "output",
         type=str,
-        help="where should the output be written? Will export a joblib.gz file.",
+        help="where should the output be written? Will export a csv(.gz) file.",
     )
     parser.add_argument(
         "--conv_layer",
@@ -41,22 +36,28 @@ def main():
         help="Which conv layer to get activations for",
     )
     parser.add_argument(
-        "--window",
+        "--filter_width",
         type=int,
-        default=200,
-        help="how wide of a window around tss to select.",
+        default=15,
+        help="how wide is the width of each filter in this layer?",
+    )
+    parser.add_argument(
+        "--n",
+        type=int,
+        default=5000,
+        help="what is the number of top activating subsequences should we use to calculate GC content?",
     )
     args = parser.parse_args()
 
     nn = clipnet.CLIPNET(n_gpus=0)
-    activations = nn.get_activation_maps(
+    gc_content = nn.get_filter_gc_content(
         args.model_fp,
         args.fasta_fp,
-        args.predicted_tss_fp,
         layer=args.conv_layer,
-        window=args.window,
+        filter_width=args.filter_width,
+        n=args.n,
     )
-    joblib.dump(activations, args.output)
+    pd.Series(gc_content).to_csv(args.output, index=False)
 
 
 if __name__ == "__main__":

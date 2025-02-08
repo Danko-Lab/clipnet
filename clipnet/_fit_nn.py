@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+## NOT IMPLEMENTED
 
 """
 This script fits a NN model using clipnet.py. It requires a NN architecture file, which
@@ -13,7 +13,7 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "4"
 logging.getLogger("tensorflow").setLevel(logging.FATAL)
-import clipnet
+from . import clipnet
 
 
 def main():
