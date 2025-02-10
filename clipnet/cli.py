@@ -307,10 +307,9 @@ def cli():
             check_additivity=not args.skip_check_additivity,
         )
 
-        # Save
+        # Save attributions
         if args.save_hypothetical:
             np.savez_compressed(args.output_fp, hyp_explanations.swapaxes(1, 2))
-        # Save hypothetical attributions
         else:
             np.savez_compressed(
                 args.output_fp,

@@ -3,7 +3,7 @@
 for i in {1..9}; do 
 clipnet attribute \
     -f data/lcl/merged_1_divergent_peaks_1kb.fa.gz \
-    -o attr/lcl_new/merged_1_divergent_peaks_1kb_quantity_shap_${i}.npz \
+    -o attr/lcl/merged_1_divergent_peaks_1kb_quantity_shap_${i}.npz \
     -m clipnet/ensemble_models/fold_${i}.h5 \
     -a quantity \
     -v -c;
@@ -12,7 +12,7 @@ done
 for i in {1..9}; do 
 clipnet attribute \
     -f data/lcl/merged_1_divergent_peaks_1kb.fa.gz \
-    -o attr/lcl_new/merged_1_divergent_peaks_1kb_profile_shap_${i}.npz \
+    -o attr/lcl/merged_1_divergent_peaks_1kb_profile_shap_${i}.npz \
     -m clipnet/ensemble_models/fold_${i}.h5 \
     -a profile \
     -v -c;

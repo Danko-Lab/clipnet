@@ -107,16 +107,10 @@ Note that while CLIPNET accepts two-hot encoded sequences to accomodate heterozy
 ```bash
 clipnet epistasis \
     -f data/test.fa \
-    -o data/test_dfim_quantity.npz \
-    -m clipnet_models/ \
-    -s 250 -e 750 \
-    -v
-
-clipnet epistasis \
-    -f data/test.fa \
     -o data/test_dfim_profile.npz \
     -m clipnet_models/ \
     -s 250 -e 750 \
+    -a profile \
     -v
 ```
 
