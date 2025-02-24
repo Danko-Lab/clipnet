@@ -16,9 +16,21 @@ import tqdm
 from silence_tensorflow import silence_tensorflow
 
 silence_tensorflow()
+import shap
 import tensorflow as tf
 
 from . import attribute, clipnet, epistasis, ism_shuffle
+
+# This may be needed to fix certain version incompatibilities
+shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
+    shap.explainers._deep.deep_tf.passthrough
+)
+tf.compat.v1.disable_v2_behavior()
+# Needed to register a custom nonlinear operation
+shap.explainers._deep.deep_tf.op_handlers["_profile_logit_scaling"] = (
+    shap.explainers._deep.deep_tf.nonlinearity_1d(0)
+)
+
 
 _help = """
 The following commands are available:

@@ -24,9 +24,9 @@ shap.explainers._deep.deep_tf.op_handlers["AddV2"] = (
 )
 tf.compat.v1.disable_v2_behavior()
 # Needed to register a custom nonlinear operation
-# shap.explainers._deep.deep_tf.op_handlers["_profile_logit_scaling"] = (
-#    shap.explainers._deep.deep_tf.nonlinearity_1d(0)
-# )
+shap.explainers._deep.deep_tf.op_handlers["_profile_logit_scaling"] = (
+    shap.explainers._deep.deep_tf.nonlinearity_1d(0)
+)
 
 
 def profile_contrib_(model):
