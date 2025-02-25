@@ -405,6 +405,8 @@ def cli():
                 )
             ]
         )
+        # Get extrema
+        dfims = epistasis.extrema(dfims, axis=2).sum(axis=-1)
 
         # Save
         np.savez(args.output_fp, dfims)
