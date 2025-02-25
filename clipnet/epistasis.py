@@ -28,8 +28,8 @@ def extrema(arr, axis=None):
     np.array, shape (...)
         The most extreme value in the tensor along the given dimension.
     """
-    tmax = arr.max(axis=axis)[0]
-    tmin = arr.min(axis=axis)[0]
+    tmax = arr.max(axis=axis)
+    tmin = arr.min(axis=axis)
     return np.where(-tmin > tmax, tmin, tmax)
 
 
