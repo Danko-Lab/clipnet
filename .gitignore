@@ -1,6 +1,7 @@
 calculate_activator_interaction.py
 test.py
 **/.DS_Store
+**/.vscode
 data/scratch.fa
 data/*.fai
 data/*.fxi
@@ -16,7 +17,7 @@ models/*.h5
 clipnet_models/*.h5
 ensemble_models/*.h5
 reference_models/*.h5
-batch_*.sh
+*.sh
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Python gitignore

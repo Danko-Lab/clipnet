@@ -29,16 +29,13 @@ shap.explainers._deep.deep_tf.op_handlers["_profile_logit_scaling"] = (
 )
 
 
-def profile_contrib_(model):
+def profile_contrib(model):
     """
-    Original implementation used in CLIPNET. Deprecated, but kept here
-    for documentation.
+    Original implementation used in CLIPNET. Follows the pseudocode presented
+    in BPNet.
     """
-    softmax = tf.keras.layers.Softmax()
-    contrib = tf.reduce_mean(
-        tf.stop_gradient(softmax(model.output[0])) * model.output[0],
-        axis=-1,
-        keepdims=True,
+    contrib = tf.reduce_sum(
+        _profile_logit_scaling(model.output[0]), axis=-1, keepdims=True
     )
     return contrib
 
@@ -46,17 +43,27 @@ def profile_contrib_(model):
 def _profile_logit_scaling(logits):
     """
     Helper function to allow this operation to be registered by shap.DeepExplainer.
+    Following the pseudocode presented in BPNet, we stop_gradient the softmax function.
+    """
+    softmax = tf.keras.layers.Softmax()
+    return tf.stop_gradient(softmax(logits)) * logits
+
+
+def _profile_logit_scaling_(logits):
+    """
+    Helper function to allow this operation to be registered by shap.DeepExplainer.
+    The version used in bpnetlite does not stop_gradient the softmax function.
     """
     softmax = tf.keras.layers.Softmax()
     return softmax(logits) * logits
 
 
-def profile_contrib(model):
+def profile_contrib_(model):
     """
     Adapted from bpnetlite.bpnet.ProfileWrapper
     """
     logits = model.output[0] - tf.reduce_mean(model.output[0], axis=-1, keepdims=True)
-    contrib = tf.reduce_sum(_profile_logit_scaling(logits), axis=-1, keepdims=True)
+    contrib = tf.reduce_sum(_profile_logit_scaling_(logits), axis=-1, keepdims=True)
     return contrib
 
 
@@ -69,7 +76,7 @@ def quantity_contrib(model):
 
 def scalar_contrib(model):
     """
-    Wraps scalar model output for consistency with oether model types.
+    Wraps scalar model output for consistency with other model types.
     """
     return model.output
 
