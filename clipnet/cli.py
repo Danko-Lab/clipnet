@@ -343,8 +343,7 @@ def cli():
     elif args.cmd == "ism_shuffle":
         # Load models and sequences
         if os.path.isdir(args.model_fp):
-            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
-            model = nn.construct_ensemble(model_names, silence=args.silence)
+            model = nn.construct_ensemble(args.model_fp, silence=not args.verbose)
         else:
             model = tf.keras.models.load_model(args.model_fp, compile=False)
         sequences = pyfastx.Fasta(args.fasta_fp)
@@ -354,7 +353,7 @@ def cli():
             model,
             sequences,
             mut_size=args.mut_size,
-            n_shuffles=args.n_shuffles,
+            n_shuffles=args.n_dinucleotide_shuffles,
             edge_padding=args.edge_padding,
             corr_pseudocount=args.pseudocount,
             logfc_pseudocount=args.pseudocount,
