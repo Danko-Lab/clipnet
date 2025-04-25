@@ -131,8 +131,7 @@ def load_seqs(
         )
     ]
     shuffled_reference = [
-        shuffle.kshuffle(rec.seq, random_seed=seed)[0]
-        for rec in tqdm.tqdm(reference, desc="Shuffling sequences", disable=silence)
+        shuffle.kshuffle(rec.seq, random_seed=seed)[0] for rec in reference
     ]
     twohot_background = utils.get_twohot_from_series(shuffled_reference, silence=True)
     if return_twohot_explains:

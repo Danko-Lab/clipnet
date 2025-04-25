@@ -82,9 +82,6 @@ class CGen(tf.keras.utils.Sequence):
         self.seq_folds = seq_folds
         self.procap_folds = procap_folds
         self.fold_list = np.arange(len(self.seq_folds))
-        # print(self.seq_folds)
-        # print(f"Loaded {len(self.fold_list)} folds.")
-        # print(self.fold_list)
         self.steps_per_epoch = steps_per_epoch
         self.batch_size = batch_size
         self.pad = pad
@@ -159,8 +156,7 @@ class CGen(tf.keras.utils.Sequence):
 
         # Extract batch from fold and return
         X = self.X_fold[batch, :, :]
-        y_batch = self.y_fold[batch, :]
-        y_sum = y_batch.sum(axis=1)
-        # y_profile = y_batch / y_sum
-        y = [y_batch, y_sum]  # for old behavior just use [y_batch, y_sum]
+        y_profile = self.y_fold[batch, :]
+        y_sum = y_profile.sum(axis=1)
+        y = [y_profile, y_sum]
         return X, y

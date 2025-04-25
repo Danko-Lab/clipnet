@@ -1,0 +1,219 @@
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to
+==================================================================================================
+ input_1 (InputLayer)        [(None, 1000, 4)]            0         []
+
+ batch_normalization (Batch  (None, 1000, 4)              16        ['input_1[0][0]']
+ Normalization)
+
+ conv1d (Conv1D)             (None, 993, 64)              2112      ['batch_normalization[0][0]']
+
+ batch_normalization_1 (Bat  (None, 993, 64)              256       ['conv1d[0][0]']
+ chNormalization)
+
+ activation (Activation)     (None, 993, 64)              0         ['batch_normalization_1[0][0]'
+                                                                    ]
+
+ max_pooling1d (MaxPooling1  (None, 496, 64)              0         ['activation[0][0]']
+ D)
+
+ conv1d_1 (Conv1D)           (None, 493, 128)             32896     ['max_pooling1d[0][0]']
+
+ batch_normalization_2 (Bat  (None, 493, 128)             512       ['conv1d_1[0][0]']
+ chNormalization)
+
+ activation_1 (Activation)   (None, 493, 128)             0         ['batch_normalization_2[0][0]'
+                                                                    ]
+
+ max_pooling1d_1 (MaxPoolin  (None, 246, 128)             0         ['activation_1[0][0]']
+ g1D)
+
+ conv1d_2 (Conv1D)           (None, 246, 64)              8256      ['max_pooling1d_1[0][0]']
+
+ conv1d_3 (Conv1D)           (None, 246, 64)              12352     ['conv1d_2[0][0]']
+
+ batch_normalization_3 (Bat  (None, 246, 64)              256       ['conv1d_3[0][0]']
+ chNormalization)
+
+ activation_2 (Activation)   (None, 246, 64)              0         ['batch_normalization_3[0][0]'
+                                                                    ]
+
+ add (Add)                   (None, 246, 64)              0         ['conv1d_2[0][0]',
+                                                                     'activation_2[0][0]']
+
+ batch_normalization_4 (Bat  (None, 246, 64)              256       ['add[0][0]']
+ chNormalization)
+
+ activation_3 (Activation)   (None, 246, 64)              0         ['batch_normalization_4[0][0]'
+                                                                    ]
+
+ conv1d_4 (Conv1D)           (None, 246, 64)              12352     ['activation_3[0][0]']
+
+ batch_normalization_5 (Bat  (None, 246, 64)              256       ['conv1d_4[0][0]']
+ chNormalization)
+
+ activation_4 (Activation)   (None, 246, 64)              0         ['batch_normalization_5[0][0]'
+                                                                    ]
+
+ add_1 (Add)                 (None, 246, 64)              0         ['activation_3[0][0]',
+                                                                     'activation_4[0][0]']
+
+ batch_normalization_6 (Bat  (None, 246, 64)              256       ['add_1[0][0]']
+ chNormalization)
+
+ activation_5 (Activation)   (None, 246, 64)              0         ['batch_normalization_6[0][0]'
+                                                                    ]
+
+ conv1d_5 (Conv1D)           (None, 246, 64)              12352     ['activation_5[0][0]']
+
+ batch_normalization_7 (Bat  (None, 246, 64)              256       ['conv1d_5[0][0]']
+ chNormalization)
+
+ activation_6 (Activation)   (None, 246, 64)              0         ['batch_normalization_7[0][0]'
+                                                                    ]
+
+ add_2 (Add)                 (None, 246, 64)              0         ['activation_5[0][0]',
+                                                                     'activation_6[0][0]']
+
+ batch_normalization_8 (Bat  (None, 246, 64)              256       ['add_2[0][0]']
+ chNormalization)
+
+ activation_7 (Activation)   (None, 246, 64)              0         ['batch_normalization_8[0][0]'
+                                                                    ]
+
+ conv1d_6 (Conv1D)           (None, 246, 64)              12352     ['activation_7[0][0]']
+
+ batch_normalization_9 (Bat  (None, 246, 64)              256       ['conv1d_6[0][0]']
+ chNormalization)
+
+ activation_8 (Activation)   (None, 246, 64)              0         ['batch_normalization_9[0][0]'
+                                                                    ]
+
+ add_3 (Add)                 (None, 246, 64)              0         ['activation_7[0][0]',
+                                                                     'activation_8[0][0]']
+
+ batch_normalization_10 (Ba  (None, 246, 64)              256       ['add_3[0][0]']
+ tchNormalization)
+
+ activation_9 (Activation)   (None, 246, 64)              0         ['batch_normalization_10[0][0]
+                                                                    ']
+
+ conv1d_7 (Conv1D)           (None, 246, 64)              12352     ['activation_9[0][0]']
+
+ batch_normalization_11 (Ba  (None, 246, 64)              256       ['conv1d_7[0][0]']
+ tchNormalization)
+
+ activation_10 (Activation)  (None, 246, 64)              0         ['batch_normalization_11[0][0]
+                                                                    ']
+
+ add_4 (Add)                 (None, 246, 64)              0         ['activation_9[0][0]',
+                                                                     'activation_10[0][0]']
+
+ batch_normalization_12 (Ba  (None, 246, 64)              256       ['add_4[0][0]']
+ tchNormalization)
+
+ activation_11 (Activation)  (None, 246, 64)              0         ['batch_normalization_12[0][0]
+                                                                    ']
+
+ conv1d_8 (Conv1D)           (None, 246, 64)              12352     ['activation_11[0][0]']
+
+ batch_normalization_13 (Ba  (None, 246, 64)              256       ['conv1d_8[0][0]']
+ tchNormalization)
+
+ activation_12 (Activation)  (None, 246, 64)              0         ['batch_normalization_13[0][0]
+                                                                    ']
+
+ add_5 (Add)                 (None, 246, 64)              0         ['activation_11[0][0]',
+                                                                     'activation_12[0][0]']
+
+ batch_normalization_14 (Ba  (None, 246, 64)              256       ['add_5[0][0]']
+ tchNormalization)
+
+ activation_13 (Activation)  (None, 246, 64)              0         ['batch_normalization_14[0][0]
+                                                                    ']
+
+ conv1d_9 (Conv1D)           (None, 246, 64)              12352     ['activation_13[0][0]']
+
+ batch_normalization_15 (Ba  (None, 246, 64)              256       ['conv1d_9[0][0]']
+ tchNormalization)
+
+ activation_14 (Activation)  (None, 246, 64)              0         ['batch_normalization_15[0][0]
+                                                                    ']
+
+ add_6 (Add)                 (None, 246, 64)              0         ['activation_13[0][0]',
+                                                                     'activation_14[0][0]']
+
+ batch_normalization_16 (Ba  (None, 246, 64)              256       ['add_6[0][0]']
+ tchNormalization)
+
+ activation_15 (Activation)  (None, 246, 64)              0         ['batch_normalization_16[0][0]
+                                                                    ']
+
+ conv1d_10 (Conv1D)          (None, 246, 64)              12352     ['activation_15[0][0]']
+
+ batch_normalization_17 (Ba  (None, 246, 64)              256       ['conv1d_10[0][0]']
+ tchNormalization)
+
+ activation_16 (Activation)  (None, 246, 64)              0         ['batch_normalization_17[0][0]
+                                                                    ']
+
+ add_7 (Add)                 (None, 246, 64)              0         ['activation_15[0][0]',
+                                                                     'activation_16[0][0]']
+
+ batch_normalization_18 (Ba  (None, 246, 64)              256       ['add_7[0][0]']
+ tchNormalization)
+
+ activation_17 (Activation)  (None, 246, 64)              0         ['batch_normalization_18[0][0]
+                                                                    ']
+
+ conv1d_11 (Conv1D)          (None, 246, 64)              12352     ['activation_17[0][0]']
+
+ batch_normalization_19 (Ba  (None, 246, 64)              256       ['conv1d_11[0][0]']
+ tchNormalization)
+
+ activation_18 (Activation)  (None, 246, 64)              0         ['batch_normalization_19[0][0]
+                                                                    ']
+
+ add_8 (Add)                 (None, 246, 64)              0         ['activation_17[0][0]',
+                                                                     'activation_18[0][0]']
+
+ batch_normalization_20 (Ba  (None, 246, 64)              256       ['add_8[0][0]']
+ tchNormalization)
+
+ activation_19 (Activation)  (None, 246, 64)              0         ['batch_normalization_20[0][0]
+                                                                    ']
+
+ max_pooling1d_2 (MaxPoolin  (None, 123, 64)              0         ['activation_19[0][0]']
+ g1D)
+
+ flatten (Flatten)           (None, 7872)                 0         ['max_pooling1d_2[0][0]']
+
+ global_average_pooling1d (  (None, 64)                   0         ['max_pooling1d_2[0][0]']
+ GlobalAveragePooling1D)
+
+ dense (Dense)               (None, 1000)                 7873000   ['flatten[0][0]']
+
+ dense_1 (Dense)             (None, 1)                    65        ['global_average_pooling1d[0][
+                                                                    0]']
+
+ batch_normalization_21 (Ba  (None, 1000)                 4000      ['dense[0][0]']
+ tchNormalization)
+
+ batch_normalization_22 (Ba  (None, 1)                    4         ['dense_1[0][0]']
+ tchNormalization)
+
+ activation_20 (Activation)  (None, 1000)                 0         ['batch_normalization_21[0][0]
+                                                                    ']
+
+ activation_21 (Activation)  (None, 1)                    0         ['batch_normalization_22[0][0]
+                                                                    ']
+
+ shape (Dropout)             (None, 1000)                 0         ['activation_20[0][0]']
+
+ sum (Dropout)               (None, 1)                    0         ['activation_21[0][0]']
+
+==================================================================================================
+Total params: 8036893 (30.66 MB)
+Trainable params: 8032195 (30.64 MB)
+Non-trainable params: 4698 (18.35 KB)
+__________________________________________________________________________________________________

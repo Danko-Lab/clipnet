@@ -9,7 +9,7 @@ attribution method.
 import numpy as np
 import tqdm
 
-from . import utils
+from . import shuffle, utils
 
 
 def extrema(arr, axis=None):
@@ -84,3 +84,59 @@ def dfim(explainers, major_seq, start, stop, check_additivity=True, silence=Fals
         fis = major_shap * major_twohot / 2 - mut_shap * mut_twohot / 2
         dfim.append(fis)
     return np.array(dfim)
+
+
+def dfim_shuffle(
+    explainers, major_seq, start, stop, n=5, check_additivity=True, silence=False
+):
+    """
+    Calculate Deep Feature Interaction Maps (DFIM) using shap.DeepExplainer as the
+    attribution method. Instead of doing a saturation mutagenesis, we shuffle a given
+    region of interest and calculate the average delta in shap values.
+
+    Parameters
+    ----------
+    explainers : list
+        List of shap.DeepExplainer objects
+    major_seq : str
+        The sequence to calculate DFIM scores for.
+    start : int
+        The start position of motif to shuffle.
+    stop : int
+        The stop position of motif to shuffle.
+    n : int, optional
+        Number of shuffles to perform, by default 5
+    check_additivity : bool, optional
+        Whether to check for additivity, by default True.
+    silence : bool, optional
+        Whether to silence tqdm, by default False
+
+    Returns
+    -------
+    np.array, shape (n, len(alphabet) - 1, len(sequence), len(alphabet))
+        The DFIM shuffles scores for a given region of interest.
+    """
+    major_twohot = np.expand_dims(utils.TwoHotDNA(major_seq).twohot, axis=0)
+    major_shap = np.array(
+        [
+            explainer.shap_values(major_twohot, check_additivity=check_additivity)[0]
+            for explainer in explainers
+        ]
+    ).mean(axis=0)
+    shuffles = shuffle.kshuffle(major_seq, num_shufs=n)
+    shuf_seqs = [
+        major_seq[:start] + shuf[1 : stop - start + 1] + major_seq[stop:]
+        for shuf in shuffles
+    ]
+    shuf_twohot = np.array([utils.TwoHotDNA(shuf_seq).twohot for shuf_seq in shuf_seqs])
+    shuf_shaps = np.array(
+        [
+            explainer.shap_values(shuf_twohot, check_additivity=check_additivity)[0]
+            for explainer in explainers
+        ]
+    ).mean(axis=0)
+    dfim = (
+        np.tile((major_shap * major_twohot / 2), (n, 1, 1))
+        - shuf_shaps * shuf_twohot / 2
+    ).mean(axis=0)
+    return dfim
