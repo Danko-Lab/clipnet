@@ -167,6 +167,16 @@ def cli():
         parents=[parser_parent],
     )
     parser_ism_shuffle.add_argument(
+        "-c",
+        "--correction",
+        type=int,
+        default=1.59687745,
+        help="The coefficient of an affine correction applied to quantity predictions."
+        "Defaults to 1.59687745, which is the correct value for the pretrained CLIPNET"
+        "model. Use 1 for no correction, or calculate an appropriate value for your "
+        "model.",
+    )
+    parser_ism_shuffle.add_argument(
         "-d",
         "--n_dinucleotide_shuffles",
         type=int,
