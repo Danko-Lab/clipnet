@@ -17,7 +17,6 @@ silence_tensorflow()
 def ism_shuffle(
     model,
     sequences,
-    correction=1,
     mut_size=10,
     n_shuffles=5,
     edge_padding=50,
@@ -64,9 +63,9 @@ def ism_shuffle(
                     metric="correlation",
                 )[0, :]
             )
-            mut_logfc = correction * np.log(
-                mut_pred[1] + logfc_pseudocount
-            ) - correction * np.log(wt_pred[1][i] + logfc_pseudocount)
+            mut_logfc = np.log(mut_pred[1] + logfc_pseudocount) - np.log(
+                wt_pred[1][i] + logfc_pseudocount
+            )
             corr_score.append(mut_corr)
             logfc_score.append(mut_logfc)
         corr_scores.append(np.array(corr_score).mean(axis=0))
