@@ -2,7 +2,11 @@
 
 CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled convolutional neural network that predicts transcription initiation from DNA sequence at single nucleotide resolution. We describe CLIPNET in our [preprint](https://www.biorxiv.org/content/10.1101/2024.03.13.583868) on bioRxiv. This repository contains code for working with CLIPNET, namely for generating predictions and feature interpretations and performing *in silico* mutagenesis scans. To reproduce the figures in our paper, please see the [clipnet_paper GitHub repo](https://github.com/Danko-Lab/clipnet_paper/).
 
-## CODE REFACTORING NOTICE:
+## PyTorch reimplementation and port
+
+Code to port the TensorFlow models to PyTorch is available as part of our [PersonalBPNet](https://github.com/adamyhe/PersonalBPNet/), which also includes a from-scratch reimplementation of CLIPNET in PyTorch with a context length of 2114 bp.
+
+## CODE REFACTORING NOTICE
 
 I have significantly altered the structure of this code base since its original release with the preprint. The new CLIPNET package should be significantly easier to use (`pip` installable, with clearer CLI and API). To access the code as it was prior to this refactoring, please check out the (unmaintained) [`deprecated`](https://github.com/Danko-Lab/clipnet/tree/deprecated) branch.
 
@@ -93,12 +97,12 @@ clipnet attribute \
     -o data/test_quantity_shap.npz \
     -m clipnet_models/ \
     -a quantity \
-    -v -c
+    -v
 
 # -c maybe needed to avoid precision errors.
 ```
 
-Note that while CLIPNET accepts two-hot encoded sequences to accomodate heterozygous positions, attributions are much more interpretable when using a haploid/fully homozygous genome, so we recommend avoiding heterozygous positions for attributions. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero.
+Note that while CLIPNET accepts two-hot encoded sequences to accomodate heterozygous positions, attributions are much more interpretable when using a haploid/fully homozygous genome, so we recommend avoiding heterozygous positions for attributions. Also note that these are actual contribution scores, as opposed to hypothetical contribution scores. Specifically, non-reference nucleotides are set to zero. To return attribution scores for all nucleotides, use the `-y` flag.
 
 #### Discovering epistatic motifs
 
@@ -114,12 +118,14 @@ clipnet epistasis \
     -v
 ```
 
-#### Genomic *in silico* mutagenesis scans NOT YET IMPLEMENTED
+Please note DFIM scores don't properly account for things like global epistasis/nonlinearity, which can cause misleading interpretations. For a more robust (but time-consuming) method for estimating interaction effects, see [SQUID](https://github.com/evanseitz/squid-nn).
 
-To generate genomic *in silico* mutagenesis scans, use the `calculate_ism_shuffle.py` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results (`corr_ism_shuffle` and `logfc_ism_shuffle`) for each record. For example:
+#### Genomic *in silico* mutagenesis scans
+
+To generate genomic *in silico* mutagenesis scans, use the `ism_shuffle` script. This script takes a fasta file containing 1000 bp records and outputs an npz file containing the ISM shuffle results (`corr_ism_shuffle` and `logfc_ism_shuffle`) for each record. For example:
 
 ```bash
-clipnet ism_shuffle -f data/test.fa -o data/test_ism.npz -v
+clipnet ism_shuffle -f data/test.fa -o data/test_ism.npz -m clipnet_models/ -v
 ```
 
 ### API usage
