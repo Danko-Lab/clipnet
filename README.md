@@ -52,6 +52,14 @@ CLIPNET can either work on haploid reference sequences (e.g. hg38) or on individ
 
 We encode sequences using a "two-hot" encoding. That is, we encoded each individual nucleotide at a given position using a one-hot encoding scheme, then represented the unphased diploid sequence as the sum of the two one-hot encoded nucleotides at each position. The sequence "AYCR" (= A(C/T)C(A/G)), for example, would be encoded as: `[[2, 0, 0, 0], [0, 1, 0, 1], [0, 2, 0, 0], [1, 0, 1, 0]]`.
 
+### Colab examples
+
+Google Colab examples for analyzing and applying CLIPNET are available through the following links:
+
+- [Basic tutorial](https://colab.research.google.com/drive/1ojhoKC5IjHjjxltZdAktSkuNFU0Wvjce?usp=sharing) illustrating how to generate predictions and attributions with the models.
+- Variant effect prediction and interpretation (TODO)
+- MPRA optimization/design (TODO)
+
 ### Command line interface
 
 CLIPNET can be accessed via a CLI:
