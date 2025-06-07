@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clipnet"
-version = "0.0.2"
+version = "0.2.0"
 description = """
 CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an 
 ensembled convolutional neural network that predicts transcription
