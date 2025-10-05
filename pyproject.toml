@@ -28,7 +28,7 @@ dependencies = [
     "shap==0.44.1",
     "tensorflow[and-cuda]>=2.14.0, <2.15.0",
     "silence_tensorflow",
-    "tqdm==4.64.1",
+    "tqdm>=4.64.1",
 ]
 
 # Maybe needed?
