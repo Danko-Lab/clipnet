@@ -19,12 +19,10 @@ mamba create -n clipnet -c conda-forge python~=3.9
 mamba activate clipnet
 ```
 
-Then clone this repo and install with `pip`:
+Then install with pip:
 
 ```bash
-git clone https://github.com/Danko-Lab/clipnet.git
-cd clipnet/
-pip install -e .
+pip install git+https://github.com/Danko-Lab/clipnet.git
 ```
 
 You may need to configure your CUDA/cudatoolkit/cudnn paths to get GPU support working. See the [tensorflow documentation](https://www.tensorflow.org/install/gpu) for more information.
