@@ -4,7 +4,7 @@ CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled
 
 ## PyTorch reimplementation and port
 
-Code to port the TensorFlow models to PyTorch is available as part of [PersonalBPNet](https://github.com/adamyhe/PersonalBPNet/), which also includes a from-scratch reimplementation of CLIPNET in PyTorch with a context length of 2114 bp.
+Code to port the TensorFlow models to PyTorch is available as part of [PersonalBPNet](https://github.com/adamyhe/PersonalBPNet/), which also includes a from-scratch reimplementation of CLIPNET in PyTorch with a context length of 2114 bp. The below instructions are for working with CLIPNET in TensorFlow.
 
 ## CODE REFACTORING NOTICE
 
