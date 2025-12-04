@@ -222,7 +222,7 @@ class CLIPNET:
                 verbose=1, bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}"
             )
             csv_logger = CSVLogger(
-                filename=os.path.join(self.model_dir, f"{self.prefix}.log"),
+                filename=os.path.join(self.model_dir, f"{self.name}.log"),
                 separator=",",
                 append=True,
             )
