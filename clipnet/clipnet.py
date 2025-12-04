@@ -265,7 +265,9 @@ class CLIPNET:
         tracks and quantities of each model in the ensemble.
         """
 
-        model_fps = list(Path(model_dir).glob("fold_*.h5"))
+        model_fps = list(Path(model_dir).glob("fold_*.h5")) + list(
+            Path(model_dir).glob("fold_*.hdf5")
+        )
         models = [
             tf.keras.models.load_model(model_fp, compile=False)
             for model_fp in tqdm.tqdm(model_fps, desc="Loading models", disable=silence)

@@ -294,7 +294,9 @@ def cli():
 
         # Create explainers
         if os.path.isdir(args.model_fp):
-            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
+            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5"))) + list(
+                glob.glob(os.path.join(args.model_fp, "*.hdf5"))
+            )
         else:
             model_names = [args.model_fp]
         explainers = attribute.create_explainers(
@@ -378,7 +380,9 @@ def cli():
 
         # Create explainers
         if os.path.isdir(args.model_fp):
-            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5")))
+            model_names = list(glob.glob(os.path.join(args.model_fp, "*.h5"))) + list(
+                glob.glob(os.path.join(args.model_fp, "*.hdf5"))
+            )
         else:
             model_names = [args.model_fp]
         explainers = attribute.create_explainers(
