@@ -319,3 +319,16 @@ def save_dict_to_hdf5(file, group, data, compression="gzip"):
 
 def l2_score(x, y):
     return np.sqrt(np.sum(np.square(x - y), axis=1))
+
+
+def warmup_lr(epoch, lr):
+    """
+    Learning rate warmup schedule.
+    """
+    print(f"LEARNING RATE = {lr}")
+    if epoch < 1:
+        return lr / 10
+    elif epoch == 1:
+        return lr * 10
+    else:
+        return lr
