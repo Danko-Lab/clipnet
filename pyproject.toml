@@ -1,20 +1,16 @@
 [build-system]
-requires = ["setuptools>=42"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "clipnet"
 version = "0.2.1"
-description = """
-CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an 
-ensembled convolutional neural network that predicts transcription
-initiation from DNA sequence at single nucleotide resolution. This package
-contains code for training, predicting, and interpreting CLIPNET models.
-"""
+description = "CLIPNET is an ensembled convolutional neural network for predicting transcription initiation from DNA sequence at single nucleotide resolution."
 authors = [{ name = "Adam He", email = "adamyhe@gmail.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 urls = { homepage = "https://github.com/adamyhe/clipnet" }
-requires-python = "~= 3.9"
+requires-python = ">= 3.9"
 dependencies = [
     "gputil",
     "h5py",

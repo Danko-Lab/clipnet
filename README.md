@@ -1,5 +1,9 @@
 # CLIPNET
 
+[![PyPI](https://img.shields.io/pypi/v/clipnet)](https://pypi.org/project/clipnet/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/clipnet?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/clipnet)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10408623.svg)](https://doi.org/10.5281/zenodo.10408623)
+
 CLIPNET (Convolutionally Learned, Initiation-Predicting NETwork) is an ensembled convolutional neural network that predicts transcription initiation from DNA sequence at single nucleotide resolution. We describe CLIPNET in our [preprint](https://www.biorxiv.org/content/10.1101/2024.03.13.583868) on bioRxiv. This repository contains code for working with CLIPNET, namely for generating predictions and feature interpretations and performing *in silico* mutagenesis scans. To reproduce the figures in our paper, please see the [clipnet_paper GitHub repo](https://github.com/Danko-Lab/clipnet_paper/).
 
 ## PyTorch reimplementation and port
@@ -22,6 +26,9 @@ mamba activate clipnet
 Then install with pip:
 
 ```bash
+# From PyPI
+pip install clipnet
+# Or from source:
 pip install git+https://github.com/Danko-Lab/clipnet.git
 ```
 
