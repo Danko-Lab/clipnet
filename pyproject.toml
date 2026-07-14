@@ -4,13 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clipnet"
-version = "0.2.2"
+version = "0.2.3"
 description = "CLIPNET is an ensembled convolutional neural network for predicting transcription initiation from DNA sequence at single nucleotide resolution."
 readme = "README.md"
 authors = [{ name = "Adam He", email = "adamyhe@gmail.com" }]
 license = "MIT"
 license-files = ["LICENSE"]
-urls = { homepage = "https://github.com/adamyhe/clipnet" }
 requires-python = ">= 3.9"
 dependencies = [
     "gputil",
@@ -27,14 +26,30 @@ dependencies = [
     "silence_tensorflow",
     "tqdm>=4.64.1",
 ]
+keywords = [
+  "bioinformatics",
+  "genomics",
+  "transcription initiation",
+  "convolutional neural network",
+  "sequence-to-function",
+  "pro-cap"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 
-# Maybe needed?
-#biopython
-#cmake
-#cython
-#ghostscript
-#pyarrow
-#pysam~=0.21.0
+[project.urls]
+Homepage = "https://github.com/danko-lab/clipnet"
+Repository = "https://github.com/danko-lab/clipnet"
+Issues = "https://github.com/danko-lab/clipnet/issues"
 
 [tool.setuptools]
 packages = ["clipnet"]
