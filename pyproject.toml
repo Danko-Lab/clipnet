@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=77"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "clipnet"
@@ -27,22 +27,22 @@ dependencies = [
     "tqdm>=4.64.1",
 ]
 keywords = [
-  "bioinformatics",
-  "genomics",
-  "transcription initiation",
-  "convolutional neural network",
-  "sequence-to-function",
-  "pro-cap"
+    "bioinformatics",
+    "genomics",
+    "transcription initiation",
+    "convolutional neural network",
+    "sequence-to-function",
+    "pro-cap",
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Intended Audience :: Science/Research",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 
 [project.urls]
@@ -50,11 +50,18 @@ Homepage = "https://github.com/danko-lab/clipnet"
 Repository = "https://github.com/danko-lab/clipnet"
 Issues = "https://github.com/danko-lab/clipnet/issues"
 
-[tool.setuptools]
-packages = ["clipnet"]
-
 [project.scripts]
 clipnet = "clipnet.cli:cli"
 
-[tool.setuptools.package-data]
-clipnet = ["data/data_fold_assignments.csv", "data/test.fa"]
+[tool.hatch.build.targets.wheel]
+packages = ["clipnet"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/clipnet",
+    "/data/data_fold_assignments.csv",
+    "/data/test.fa",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
